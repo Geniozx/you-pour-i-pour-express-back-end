@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 
+const verifyToken = require('../middleware/verify-token');
+
 const {
   createBookingRequest,
   getAllBookingRequests,
@@ -8,9 +10,10 @@ const {
   updateBookingRequestStatus
 } = require('../controllers/bookingRequestsController');
 
-router.get("/", getAllBookingRequests);
-router.get("/:id", getBookingRequestById);
 router.post("/", createBookingRequest);
-router.patch("/:id", updateBookingRequestStatus);
+
+router.get("/", verifyToken, getAllBookingRequests);
+router.get("/:id", verifyToken, getBookingRequestById);
+router.patch("/:id", verifyToken, updateBookingRequestStatus);
 
 module.exports = router;
