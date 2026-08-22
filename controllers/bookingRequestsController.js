@@ -84,15 +84,19 @@ async function createBookingRequest(req, res) {
   }
 }
 
+
+
+
 async function getAllBookingRequests(req, res) {
   try {
     const bookingResult = await pool.query(
       `SELECT *
        FROM booking_requests
-       ORDER BY created_at DESC`
+       WHERE id = $1`,
+       [req.params.id]
     );
 
-    const bookingRequests = bookingResult.rows;
+    const bookingRequests = bookingResult.rows[0];
 
     res.status(200).json(bookingRequests);
   } catch (err) {
@@ -100,7 +104,80 @@ async function getAllBookingRequests(req, res) {
   }
 }
 
+
+
+
+
+async function getBookingRequestById(req, res) {
+  try {
+    const bookingResult = await pool.query(
+      `SELECT *
+       FROM booking_requests
+       WHERE id = $1`,
+      [req.params.id]
+    );
+
+    const bookingRequest = bookingResult.rows[0];
+
+    if (!bookingRequest) {
+      return res.status(404).json({
+        err: "Booking request not found."
+      });
+    }
+
+    res.status(200).json(bookingRequest);
+  } catch (err) {
+    res.status(500).json({ err: err.message });
+  }
+}
+
+
+
+
+
+
+async function updateBookingRequestStatus(req, res) {
+  try {
+    const { status } = req.body;
+
+    const allowedStatuses = [
+      "new",
+      "contacted",
+      "confirmed",
+      "declined"
+    ];
+
+    if (!allowedStatuses.includes(status)) {
+      return res.status(400).json({
+        err: "Invalid status."
+      });
+    }
+
+    const bookingResult = await pool.query(
+      `UPDATE booking_requests
+       SET status = $1
+       WHERE id = $2
+       RETURNING *`,
+      [status, req.params.id]
+    );
+
+    const bookingRequest = bookingResult.rows[0];
+
+    if (!bookingRequest) {
+      return res.status(404).json({
+        err: "Booking request not found."
+      });
+    }
+
+    res.status(200).json(bookingRequest);
+  } catch (err) {
+    res.status(500).json({ err: err.message });
+  }
+}
+
 module.exports = {
   createBookingRequest,
-  getAllBookingRequests
+  getAllBookingRequests,
+  getBookingRequestById,
+  updateBookingRequestStatus
 };

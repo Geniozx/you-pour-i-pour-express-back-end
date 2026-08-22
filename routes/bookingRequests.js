@@ -3,10 +3,14 @@ const router = express.Router();
 
 const {
   createBookingRequest,
-  getAllBookingRequests
+  getAllBookingRequests,
+  getBookingRequestById,
+  updateBookingRequestStatus
 } = require('../controllers/bookingRequestsController');
 
 router.get("/", getAllBookingRequests);
+router.get("/:id", getBookingRequestById);
 router.post("/", createBookingRequest);
+router.patch("/:id", updateBookingRequestStatus);
 
 module.exports = router;
