@@ -4,15 +4,19 @@ const express = require('express');
 const router = express.Router();
 
 
-const User = require('../models/user');
-// Add to your imports at the top
+const pool = require('../db/database');
+
 const verifyToken = require('../middleware/verify-token');
 
 
 router.get('/', verifyToken, async (req, res) => {
   try {
-    // Get a list of all users, but only return their username and _id
-    const users = await User.find({}, "username");
+    // Get a list of all users, but only return their username and id
+    const usersResult = await pool.query(
+      "SELECT id, username FROM users"
+    );
+
+    const users = usersResult.rows;
 
     res.json(users);
   } catch (err) {
@@ -23,20 +27,27 @@ router.get('/', verifyToken, async (req, res) => {
 
 
 
-// controllers/users.js
+
 
 router.get('/:userId', verifyToken, async (req, res) => {
   try {
     // If the user is looking for the details of another user, block the request
     // Send a 403 status code to indicate that the user is unauthorized
-    if (req.user._id !== req.params.userId){
-      return res.status(403).json({ err: "Unauthorized"});
+    if (req.user.id !== Number(req.params.userId)) {
+      return res.status(403).json({ err: "Unauthorized" });
     }
 
-    const user = await User.findById(req.params.userId);
+    const userResult = await pool.query(
+      "SELECT id, username FROM users WHERE id = $1",
+      [req.params.userId]
+    );
+
+    const user = userResult.rows[0];
 
     if (!user) {
-      return res.status(404).json({ err: 'User not found.'});
+      return res.status(404).json({ 
+        err: 'User not found.'
+      });
     }
 
     res.json({ user });

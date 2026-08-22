@@ -1,12 +1,12 @@
 // /controllers/auth.js
 const express = require('express');
 const router = express.Router();
-// Add bcrypt and the user model
+// Import bcrypt for password hashing
 const bcrypt = require('bcrypt');
 // Add jsonwebtoken import
 const jwt = require('jsonwebtoken');
 
-const User = require('../models/user');
+const pool = require('../db/database');
 
 // Add in constant for the number of rounds 
 const saltRounds = 12;
@@ -14,20 +14,36 @@ const saltRounds = 12;
 router.post('/sign-up', async (req, res) => {
   try {
     // Check if the username is already taken
-    const userInDatabase = await User.findOne({ username: req.body.username });
+    const existingUserResult = await pool.query(
+      "SELECT * FROM users WHERE username = $1",
+      [req.body.username]
+    );
+
+    const userInDatabase = existingUserResult.rows[0];
 
     if (userInDatabase) {
-      return res.status(409).json({err:'Username already taken.'});
+      return res.status(409).json({
+        err: 'Username already taken.'
+      });
     }
 
     // Create a new user with hashed password
-    const user = await User.create({
-      username: req.body.username,
-      hashedPassword: bcrypt.hashSync(req.body.password, saltRounds)
-    });
+    const hashedPassword = bcrypt.hashSync(
+      req.body.password,
+      saltRounds
+    );
+
+    const newUserResult = await pool.query(
+      `INSERT INTO users (username, hashed_password)
+      VALUES ($1, $2)
+      RETURNING id, username`,
+      [req.body.username, hashedPassword]
+    );
+
+    const user = newUserResult.rows[0];
 
     // Construct the payload
-    const payload = { username: user.username, _id: user._id };
+    const payload = { username: user.username, id: user.id };
 
     // Create the token, attaching the payload
     const token = jwt.sign({ payload }, process.env.JWT_SECRET);
@@ -45,15 +61,22 @@ router.post('/sign-up', async (req, res) => {
 router.post('/sign-in', async (req, res) => {
   try {
     // Look up the user by their username in the database
-    const user = await User.findOne({ username: req.body.username });
+    const userResult = await pool.query(
+      "SELECT * FROM users WHERE username = $1",
+      [req.body.username]
+    );
+
+    const user = userResult.rows[0];
     // If the user doesn't exist, return a 401 status code with a message
     if (!user) {
       return res.status(401).json({ err: 'Invalid credentials.' });
     }
+    
 
      // Check if the password is correct using bcrypt
     const isPasswordCorrect = bcrypt.compareSync(
-      req.body.password, user.hashedPassword
+      req.body.password,
+      user.hashed_password
     );
     // If the password is incorrect, return a 401 status code with a message
     if (!isPasswordCorrect) {
@@ -61,7 +84,7 @@ router.post('/sign-in', async (req, res) => {
     }
 
      // Construct the payload
-    const payload = { username: user.username, _id: user._id };
+    const payload = { username: user.username, id: user.id };
 
     // Create the token, attaching the payload
     const token = jwt.sign({ payload }, process.env.JWT_SECRET);
