@@ -1,12 +1,13 @@
 import { Routes, Route, Link } from 'react-router-dom';
+import "./App.css";
 
-import Home from './pages/Home';
-import Services from './pages/Services';
-import ServiceDetails from './pages/ServiceDetails';
-import Gallery from './pages/Gallery';
-import About from './pages/About';
-import RequestQuote from './pages/RequestQuote';
-import Confirmation from './pages/Confirmation';
+import Home from './pages/Home.jsx';
+import Services from './pages/Services.jsx';
+import ServiceDetails from './pages/ServiceDetails.jsx';
+import Gallery from './pages/Gallery.jsx';
+import About from './pages/About.jsx';
+import RequestQuote from './pages/RequestQuote.jsx';
+import Confirmation from './pages/Confirmation.jsx';
 
 function App() {
   return (
