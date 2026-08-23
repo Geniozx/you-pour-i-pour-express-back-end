@@ -20,6 +20,7 @@ async function createBookingRequest(req, res) {
         !email ||
         !phone ||
         !event_date ||
+        !event_type ||
         !event_location ||
         !guest_count ||
         !service_id ||
