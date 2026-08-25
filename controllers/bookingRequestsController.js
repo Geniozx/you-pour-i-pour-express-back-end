@@ -1,4 +1,10 @@
 const pool = require('../db/database');
+const generateConfirmationNumber = require(
+  "../utils/generateConfirmationNumber.js"
+)
+const sendConfirmationEmail = require(
+  "../utils/sendConfirmationEmail"
+);
 
 
 async function createBookingRequest(req, res) {
@@ -50,6 +56,8 @@ async function createBookingRequest(req, res) {
         });
     }
 
+    const confirmationNumber = generateConfirmationNumber();
+
     const bookingResult = await pool.query(
       `INSERT INTO booking_requests (
         customer_name,
@@ -60,9 +68,10 @@ async function createBookingRequest(req, res) {
         event_location,
         guest_count,
         service_id,
-        message
+        message,
+        confirmation_number
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
       RETURNING *`,
       [
         customer_name,
@@ -73,11 +82,14 @@ async function createBookingRequest(req, res) {
         event_location,
         guest_count,
         service_id,
-        message
+        message,
+        confirmationNumber
       ]
     );
 
     const bookingRequest = bookingResult.rows[0];
+
+    await sendConfirmationEmail(bookingRequest);
 
     res.status(201).json(bookingRequest);
   } catch (err) {

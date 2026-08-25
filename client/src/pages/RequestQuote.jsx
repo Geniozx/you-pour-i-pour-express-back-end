@@ -68,8 +68,13 @@ function RequestQuote() {
         throw new Error(errorData.err);
       }
       
-
-      navigate("/confirmation");
+      const data = await response.json();
+      
+      navigate("/confirmation", {
+        state: {
+          bookingRequest: data
+        }
+      });
 
     } catch (err) {
         setError(err.message);

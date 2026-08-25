@@ -1,23 +1,35 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 
 function Confirmation() {
+  const location = useLocation();
+
+  const bookingRequest = location.state?.bookingRequest;
+
+  if (!bookingRequest) {
+    return (
+      <div>
+        <h2>Confirmation</h2>
+        <p>No booking confirmation was found.</p>
+      </div>
+    );
+  }
+
   return (
     <div>
-      <h2>Request Received!</h2>
+      <h2>Booking Request Received</h2>
+
+      <p>Thank you, {bookingRequest.customer_name}.</p>
+
+      <p>Your confirmation number is:</p>
+
+      <h3>{bookingRequest.confirmation_number}</h3>
 
       <p>
-        Thank you for contacting You Party - I Pour.
+        A confirmation email has been sent to {bookingRequest.email}.
       </p>
 
-      <p>
-        We've received your event request and will contact you
-        to confirm availability and discuss the details.
-      </p>
-
-      <Link to="/">
-        Back to Home
-      </Link>
+      <Link to="/">Return Home</Link>
     </div>
   );
 }
