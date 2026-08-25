@@ -21,20 +21,46 @@ async function createBookingRequest(req, res) {
       message
     } = req.body;
 
+    const cleanedName =
+      typeof customer_name === "string" ? customer_name.trim() : "";
+
+    const cleanedEmail =
+      typeof email === "string" ? email.trim().toLowerCase() : "";
+
+    const cleanedPhone =
+      typeof phone === "string" ? phone.trim() : "";
+
+    const cleanedEventType =
+      typeof event_type === "string" ? event_type.trim() : "";
+
+    const cleanedEventLocation =
+      typeof event_location === "string" ? event_location.trim() : "";
+
+    const cleanedMessage =
+      typeof message === "string" ? message.trim() : "";
+
     if (
-        !customer_name ||
-        !email ||
-        !phone ||
-        !event_date ||
-        !event_type ||
-        !event_location ||
-        !guest_count ||
-        !service_id ||
-        !message
+      !cleanedName ||
+      !cleanedEmail ||
+      !cleanedPhone ||
+      !event_date ||
+      !cleanedEventType ||
+      !cleanedEventLocation ||
+      !guest_count ||
+      !service_id ||
+      !cleanedMessage
     ) {
-        return res.status(400).json({
-            err: "All fields are required."
-        });
+      return res.status(400).json({
+        err: "All fields are required."
+      });
+    }
+
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(cleanedEmail)) {
+      return res.status(400).json({
+        err: "Please enter a valid email address."
+      });
     }
 
     if (guest_count <= 0) {
@@ -72,31 +98,53 @@ async function createBookingRequest(req, res) {
         confirmation_number
       )
       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-      RETURNING *`,
-      [
+      RETURNING
+        id,
         customer_name,
         email,
-        phone,
         event_date,
         event_type,
         event_location,
         guest_count,
         service_id,
-        message,
+        confirmation_number`,
+      [
+        cleanedName,
+        cleanedEmail,
+        cleanedPhone,
+        event_date,
+        cleanedEventType,
+        cleanedEventLocation,
+        guest_count,
+        service_id,
+        cleanedMessage,
         confirmationNumber
       ]
     );
 
     const bookingRequest = bookingResult.rows[0];
 
+    let emailStatus = "sent";
+
     try {
       await sendConfirmationEmail(bookingRequest);
     } catch (emailErr) {
+      emailStatus = "failed";
+
       console.error(
         "Confirmation email failed:",
         emailErr.message
       );
     }
+
+    await pool.query(
+      `UPDATE booking_requests
+      SET email_status = $1
+      WHERE id = $2`,
+      [emailStatus, bookingRequest.id]
+    );
+
+    bookingRequest.email_status = emailStatus;
 
     res.status(201).json(bookingRequest);
   } catch (err) {
