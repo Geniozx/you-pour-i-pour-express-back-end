@@ -160,11 +160,10 @@ async function getAllBookingRequests(req, res) {
     const bookingResult = await pool.query(
       `SELECT *
        FROM booking_requests
-       WHERE id = $1`,
-       [req.params.id]
+       ORDER BY id DESC`
     );
 
-    const bookingRequests = bookingResult.rows[0];
+    const bookingRequests = bookingResult.rows;
 
     res.status(200).json(bookingRequests);
   } catch (err) {
@@ -243,9 +242,68 @@ async function updateBookingRequestStatus(req, res) {
   }
 }
 
+
+async function resendConfirmationEmail(req, res) {
+  try {
+    const bookingResult = await pool.query(
+      `SELECT *
+       FROM booking_requests
+       WHERE id = $1`,
+      [req.params.id]
+    );
+
+    const bookingRequest = bookingResult.rows[0];
+
+    if (!bookingRequest) {
+      return res.status(404).json({
+        err: "Booking request not found."
+      });
+    }
+
+    try {
+      await sendConfirmationEmail(bookingRequest);
+
+      await pool.query(
+        `UPDATE booking_requests
+         SET email_status = 'sent'
+         WHERE id = $1`,
+        [bookingRequest.id]
+      );
+
+      bookingRequest.email_status = "sent";
+
+      return res.status(200).json({
+        message: "Confirmation email resent successfully.",
+        bookingRequest
+      });
+    } catch (emailErr) {
+      await pool.query(
+        `UPDATE booking_requests
+         SET email_status = 'failed'
+         WHERE id = $1`,
+        [bookingRequest.id]
+      );
+
+      console.error(
+        "Confirmation email resend failed:",
+        emailErr.message
+      );
+
+      return res.status(500).json({
+        err: "Confirmation email could not be resent."
+      });
+    }
+  } catch (err) {
+    res.status(500).json({
+      err: err.message
+    });
+  }
+}
+
 module.exports = {
   createBookingRequest,
   getAllBookingRequests,
   getBookingRequestById,
-  updateBookingRequestStatus
+  updateBookingRequestStatus,
+  resendConfirmationEmail
 };

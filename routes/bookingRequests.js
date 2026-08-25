@@ -7,7 +7,8 @@ const {
   createBookingRequest,
   getAllBookingRequests,
   getBookingRequestById,
-  updateBookingRequestStatus
+  updateBookingRequestStatus,
+  resendConfirmationEmail
 } = require('../controllers/bookingRequestsController');
 
 router.post("/", createBookingRequest);
@@ -15,5 +16,6 @@ router.post("/", createBookingRequest);
 router.get("/", verifyToken, getAllBookingRequests);
 router.get("/:id", verifyToken, getBookingRequestById);
 router.patch("/:id", verifyToken, updateBookingRequestStatus);
+router.post("/:id/resend-confirmation", verifyToken, resendConfirmationEmail);
 
 module.exports = router;

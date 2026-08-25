@@ -8,6 +8,9 @@ import Gallery from './pages/Gallery.jsx';
 import About from './pages/About.jsx';
 import RequestQuote from './pages/RequestQuote.jsx';
 import Confirmation from './pages/Confirmation.jsx';
+import AdminLogin from './pages/AdminLogin.jsx';
+import AdminDashboard from "./pages/AdminDashboard.jsx";
+import AdminBookingDetails from "./pages/AdminBookingDetails.jsx";
 
 function App() {
   return (
@@ -30,7 +33,15 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/request-quote" element={<RequestQuote />} />
         <Route path="/confirmation" element={<Confirmation />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+        <Route path="/admin/bookings/:id" element={<AdminBookingDetails />} />
       </Routes>
+
+      <footer>
+        <p>© 2026 You Party - I Pour</p>
+        <Link to="/admin/login">Admin Sign In</Link>
+      </footer>
     </div>
   );
 }

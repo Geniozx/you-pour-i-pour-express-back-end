@@ -202,6 +202,18 @@
   padding: 16px;
 }
 
+footer {
+  margin-top: 40px;
+  padding: 20px;
+  text-align: center;
+  border-top: 1px solid #ddd;
+}
+
+footer a {
+  display: inline-block;
+  margin-top: 8px;
+}
+
 @media (max-width: 900px) {
   .gallery-grid {
     grid-template-columns: 1fr;
