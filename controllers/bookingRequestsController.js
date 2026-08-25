@@ -89,7 +89,14 @@ async function createBookingRequest(req, res) {
 
     const bookingRequest = bookingResult.rows[0];
 
-    await sendConfirmationEmail(bookingRequest);
+    try {
+      await sendConfirmationEmail(bookingRequest);
+    } catch (emailErr) {
+      console.error(
+        "Confirmation email failed:",
+        emailErr.message
+      );
+    }
 
     res.status(201).json(bookingRequest);
   } catch (err) {
