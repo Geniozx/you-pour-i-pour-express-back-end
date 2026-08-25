@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function RequestQuote() {
+  const [searchParams] = useSearchParams();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [eventDate, setEventDate] = useState("");
@@ -13,16 +15,24 @@ function RequestQuote() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
-  const [success, setSuccess] = useState("");
+  
 
   const [submitting, setSubmitting] = useState(false);
 
+  const navigate = useNavigate();
+  const selectedService = searchParams.get("service");
   const today = new Date().toISOString().split("T")[0];
+
+    useEffect(() => {
+      if (selectedService) {
+        setServiceId(selectedService);
+      }
+    }, [selectedService]);
 
     async function handleSubmit(event) {
       event.preventDefault();
 
-      setSuccess("");
+
       setError("");
       setSubmitting(true);
 
@@ -59,17 +69,8 @@ function RequestQuote() {
       }
       
 
-      setSuccess("Quote request submitted successfully.");
+      navigate("/confirmation");
 
-      setName("");
-      setEmail("");
-      setPhone("");
-      setEventDate("");
-      setEventType("");
-      setEventLocation("");
-      setGuestCount("");
-      setServiceId("");
-      setMessage("");
     } catch (err) {
         setError(err.message);
       } finally {
@@ -220,8 +221,8 @@ function RequestQuote() {
               {service.name}
             </option>
           ))}
-          {loading && <p>Loading services...</p>}
         </select>
+        {loading && <p>Loading services...</p>}
 
 
         <label>Message: </label>
@@ -243,7 +244,6 @@ function RequestQuote() {
       </form>
 
       
-      {success && <p>{success}</p>}
       {error && <p>{error}</p>}
     </div>
   );
