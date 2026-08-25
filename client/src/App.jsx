@@ -19,7 +19,7 @@ function App() {
         <Link to="/services">Services</Link>{' '}
         <Link to="/gallery">Gallery</Link>{' '}
         <Link to="/about">About</Link>{' '}
-        <Link to="/request-quote">Request a Quote</Link>
+        <Link to="/request-quote">Request Quote</Link>
       </nav>
 
       <Routes>

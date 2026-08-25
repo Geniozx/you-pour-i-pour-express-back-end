@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from "react-router-dom";
 
 function Services() {
   const [services, setServices] = useState([]);
@@ -42,6 +43,11 @@ function Services() {
           <h3>{service.name}</h3>
           <p>{service.description}</p>
           <p>${service.price}</p>
+        
+
+          <Link to={`/services/${service.id}`}>
+            View Details 
+          </Link>
         </div>
       ))}
     </div>
