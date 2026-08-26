@@ -1,4 +1,5 @@
-import { Routes, Route, Link } from 'react-router-dom';
+import { useState } from "react";
+import { Routes, Route, Link, useNavigate } from 'react-router-dom';
 import "./App.css";
 
 import Home from './pages/Home.jsx';
@@ -12,7 +13,21 @@ import AdminLogin from './pages/AdminLogin.jsx';
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import AdminBookingDetails from "./pages/AdminBookingDetails.jsx";
 
+
 function App() {
+  const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(
+    !!localStorage.getItem("token")
+  );
+
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    setIsAdminLoggedIn(false);
+    navigate("/admin/login");
+  }
+
+
   return (
     <div>
       <h1>You Party - I Pour</h1>
@@ -23,6 +38,19 @@ function App() {
         <Link to="/gallery">Gallery</Link>{' '}
         <Link to="/about">About</Link>{' '}
         <Link to="/request-quote">Request Quote</Link>
+
+        {isAdminLoggedIn && (
+          <>
+            {' '}
+            <Link to="/admin/dashboard">
+              Admin Dashboard
+            </Link>{' '}
+
+            <button onClick={handleLogout}>
+              Log Out
+            </button>
+          </>
+        )}
       </nav>
 
       <Routes>
@@ -33,14 +61,21 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/request-quote" element={<RequestQuote />} />
         <Route path="/confirmation" element={<Confirmation />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route
+          path="/admin/login"
+          element={
+            <AdminLogin
+              onLogin={() => setIsAdminLoggedIn(true)}
+            />
+          }
+        />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/bookings/:id" element={<AdminBookingDetails />} />
       </Routes>
 
       <footer>
         <p>© 2026 You Party - I Pour</p>
-        <Link to="/admin/login">Admin Sign In</Link>
+        <Link to="/admin/login">Admin</Link>
       </footer>
     </div>
   );

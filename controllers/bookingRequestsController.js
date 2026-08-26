@@ -158,16 +158,20 @@ async function createBookingRequest(req, res) {
 async function getAllBookingRequests(req, res) {
   try {
     const bookingResult = await pool.query(
-      `SELECT *
-       FROM booking_requests
-       ORDER BY id DESC`
+      `SELECT
+        booking_requests.*,
+        services.name AS service_name
+      FROM booking_requests
+      JOIN services
+        ON booking_requests.service_id = services.id
+      ORDER BY booking_requests.id DESC`
     );
 
-    const bookingRequests = bookingResult.rows;
-
-    res.status(200).json(bookingRequests);
+    res.status(200).json(bookingResult.rows);
   } catch (err) {
-    res.status(500).json({ err: err.message });
+    res.status(500).json({
+      err: err.message
+    });
   }
 }
 
@@ -178,9 +182,13 @@ async function getAllBookingRequests(req, res) {
 async function getBookingRequestById(req, res) {
   try {
     const bookingResult = await pool.query(
-      `SELECT *
-       FROM booking_requests
-       WHERE id = $1`,
+      `SELECT
+        booking_requests.*,
+        services.name AS service_name
+      FROM booking_requests
+      JOIN services
+        ON booking_requests.service_id = services.id
+      WHERE booking_requests.id = $1`,
       [req.params.id]
     );
 
@@ -239,6 +247,40 @@ async function updateBookingRequestStatus(req, res) {
     res.status(200).json(bookingRequest);
   } catch (err) {
     res.status(500).json({ err: err.message });
+  }
+}
+
+
+async function updateBookingRequestNotes(req, res) {
+  try {
+    const { admin_notes } = req.body;
+
+    const cleanedNotes =
+      typeof admin_notes === "string"
+        ? admin_notes.trim()
+        : "";
+
+    const bookingResult = await pool.query(
+      `UPDATE booking_requests
+       SET admin_notes = $1
+       WHERE id = $2
+       RETURNING *`,
+      [cleanedNotes, req.params.id]
+    );
+
+    const bookingRequest = bookingResult.rows[0];
+
+    if (!bookingRequest) {
+      return res.status(404).json({
+        err: "Booking request not found."
+      });
+    }
+
+    res.status(200).json(bookingRequest);
+  } catch (err) {
+    res.status(500).json({
+      err: err.message
+    });
   }
 }
 
@@ -305,5 +347,6 @@ module.exports = {
   getAllBookingRequests,
   getBookingRequestById,
   updateBookingRequestStatus,
-  resendConfirmationEmail
+  resendConfirmationEmail,
+  updateBookingRequestNotes
 };

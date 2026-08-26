@@ -5,6 +5,10 @@ function AdminDashboard() {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [search, setSearch] = useState("");
+    const [statusFilter, setStatusFilter] = useState("all");
+    const [emailFilter, setEmailFilter] = useState("all");
+    const [sortBy, setSortBy] = useState("newest");
 
     const navigate = useNavigate();
 
@@ -54,9 +58,78 @@ function AdminDashboard() {
         return <p>Loading booking requests...</p>;
     }
 
+    const filteredBookings = bookings
+        .filter((booking) => {
+            const searchValue = search.toLowerCase();
+
+            const matchesSearch =
+            (booking.customer_name || "")
+                .toLowerCase()
+                .includes(searchValue) ||
+            (booking.email || "")
+                .toLowerCase()
+                .includes(searchValue) ||
+            (booking.confirmation_number || "")
+                .toLowerCase()
+                .includes(searchValue);
+
+            const matchesStatus =
+            statusFilter === "all" ||
+            booking.status === statusFilter;
+
+            const matchesEmail =
+            emailFilter === "all" ||
+            booking.email_status === emailFilter;
+
+            return (
+            matchesSearch &&
+            matchesStatus &&
+            matchesEmail
+            );
+        })
+        .sort((a, b) => {
+            if (sortBy === "event-date") {
+            return new Date(a.event_date) - new Date(b.event_date);
+            }
+
+            return b.id - a.id;
+        });
+
+
+        const newCount = bookings.filter(
+            (booking) => booking.status === "new"
+        ).length;
+
+        const contactedCount = bookings.filter(
+            (booking) => booking.status === "contacted"
+        ).length;
+
+        const confirmedCount = bookings.filter(
+            (booking) => booking.status === "confirmed"
+        ).length;
+
+        const declinedCount = bookings.filter(
+            (booking) => booking.status === "declined"
+        ).length;
+
+        const failedEmailCount = bookings.filter(
+            (booking) => booking.email_status === "failed"
+        ).length;
+
     return (
         <div>
         <h2>Admin Dashboard</h2>
+
+        <div>
+            <h3>Overview</h3>
+
+            <p>Total Requests: {bookings.length}</p>
+            <p>New: {newCount}</p>
+            <p>Contacted: {contactedCount}</p>
+            <p>Confirmed: {confirmedCount}</p>
+            <p>Declined: {declinedCount}</p>
+            <p>Failed Emails: {failedEmailCount}</p>
+        </div>
 
         <h3>Booking Requests</h3>
 
@@ -66,29 +139,82 @@ function AdminDashboard() {
             <p>No booking requests found.</p>
         )}
 
-        {bookings.map((booking) => (
+        <div>
+            <input
+                type="text"
+                value={search}
+                placeholder="Search name, email, or confirmation number"
+                onChange={(event) => {
+                setSearch(event.target.value);
+                }}
+            />
+
+            <select
+                value={statusFilter}
+                onChange={(event) => {
+                setStatusFilter(event.target.value);
+                }}
+            >
+                <option value="all">All Statuses</option>
+                <option value="new">New</option>
+                <option value="contacted">Contacted</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="declined">Declined</option>
+            </select>
+
+            <select
+                value={emailFilter}
+                onChange={(event) => {
+                setEmailFilter(event.target.value);
+                }}
+            >
+                <option value="all">All Email Statuses</option>
+                <option value="sent">Email Sent</option>
+                <option value="failed">Email Failed</option>
+                <option value="pending">Email Pending</option>
+            </select>
+
+            <select
+                value={sortBy}
+                onChange={(event) => {
+                setSortBy(event.target.value);
+                }}
+            >
+                <option value="newest">Newest Requests</option>
+                <option value="event-date">Upcoming Event Date</option>
+            </select>
+        </div>
+
+
+        {filteredBookings.length === 0 && (
+            <p>No matching booking requests.</p>
+        )}
+
+        {filteredBookings.map((booking) => (
             <div key={booking.id}>
-            <h4>{booking.customer_name}</h4>
+                <h4>{booking.customer_name}</h4>
 
-            <p>
-                Confirmation: {booking.confirmation_number}
-            </p>
+                <p>
+                    Confirmation: {booking.confirmation_number}
+                </p>
 
-            <Link to={`/admin/bookings/${booking.id}`}>
-                View Details
-            </Link>
+                <Link to={`/admin/bookings/${booking.id}`}>
+                    View Details
+                </Link>
 
-            <p>Email: {booking.email}</p>
+                <p>Email: {booking.email}</p>
 
-            <p>Event Type: {booking.event_type}</p>
+                <p>Event Type: {booking.event_type}</p>
 
-            <p>Event Date: {booking.event_date}</p>
+                <p>Event Date: {booking.event_date}</p>
 
-            <p>Guests: {booking.guest_count}</p>
+                <p>Guests: {booking.guest_count}</p>
 
-            <p>Status: {booking.status}</p>
+                <p>Service: {booking.service_name}</p>
 
-            <p>Email Status: {booking.email_status}</p>
+                <p>Status: {booking.status}</p>
+
+                <p>Email Status: {booking.email_status}</p>
             </div>
         ))}
         </div>

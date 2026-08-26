@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 
-function AdminLogin() {
+function AdminLogin({ onLogin }) {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
@@ -38,6 +38,8 @@ function AdminLogin() {
             }
 
             localStorage.setItem("token", data.token);
+
+            onLogin();
 
             navigate("/admin/dashboard");
         } catch (err) {

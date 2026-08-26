@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 function AdminBookingDetails() {
     const [booking, setBooking] = useState(null);
@@ -9,50 +9,54 @@ function AdminBookingDetails() {
     const [statusMessage, setStatusMessage] = useState("");
     const [resending, setResending] = useState(false);
     const [emailMessage, setEmailMessage] = useState("");
+    const [notes, setNotes] = useState("");
+    const [savingNotes, setSavingNotes] = useState(false);
+    const [notesMessage, setNotesMessage] = useState("");
 
     const { id } = useParams();
     const navigate = useNavigate();
 
     useEffect(() => {
         async function fetchBooking() {
-        const token = localStorage.getItem("token");
+            const token = localStorage.getItem("token");
 
-        if (!token) {
-            navigate("/admin/login");
-            return;
-        }
+            if (!token) {
+                navigate("/admin/login");
+                return;
+            }
 
-        try {
-            const response = await fetch(
-            `http://localhost:3000/api/booking-requests/${id}`,
-            {
-                headers: {
-                Authorization: `Bearer ${token}`
+            try {
+                const response = await fetch(
+                    `http://localhost:3000/api/booking-requests/${id}`,
+                    {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                    }
+                );
+
+                if (response.status === 401) {
+                    localStorage.removeItem("token");
+                    navigate("/admin/login");
+                    return;
                 }
+
+                if (!response.ok) {
+                    throw new Error("Unable to load booking request.");
+                }
+
+                const data = await response.json();
+
+                setBooking(data);
+                setNotes(data.admin_notes || "");
+                } catch (err) {
+                    setError(err.message);
+                } finally {
+                    setLoading(false);
             }
-            );
-
-            if (response.status === 401) {
-            localStorage.removeItem("token");
-            navigate("/admin/login");
-            return;
-            }
-
-            if (!response.ok) {
-            throw new Error("Unable to load booking request.");
-            }
-
-            const data = await response.json();
-
-            setBooking(data);
-        } catch (err) {
-            setError(err.message);
-        } finally {
-            setLoading(false);
-        }
         }
 
-        fetchBooking();
+            fetchBooking();
     }, [id, navigate]);
 
     if (loading) {
@@ -90,15 +94,15 @@ function AdminBookingDetails() {
             );
 
             if (response.status === 401) {
-            localStorage.removeItem("token");
-            navigate("/admin/login");
-            return;
+                localStorage.removeItem("token");
+                navigate("/admin/login");
+                return;
             }
 
             const data = await response.json();
 
             if (!response.ok) {
-            throw new Error(data.err || "Unable to update booking status.");
+                throw new Error(data.err || "Unable to update booking status.");
             }
 
             setBooking(data);
@@ -107,6 +111,52 @@ function AdminBookingDetails() {
             setStatusMessage(err.message);
         } finally {
             setUpdating(false);
+        }
+    }
+
+
+    async function handleSaveNotes() {
+        const token = localStorage.getItem("token");
+
+        setSavingNotes(true);
+        setNotesMessage("");
+
+        try {
+            const response = await fetch(
+            `http://localhost:3000/api/booking-requests/${id}/notes`,
+            {
+                method: "PATCH",
+                headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                admin_notes: notes
+                })
+            }
+            );
+
+            if (response.status === 401) {
+                localStorage.removeItem("token");
+                navigate("/admin/login");
+                return;
+            }
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    data.err || "Unable to save admin notes."
+                );
+            }
+
+            setBooking(data);
+            setNotes(data.admin_notes || "");
+            setNotesMessage("Admin notes saved.");
+        } catch (err) {
+            setNotesMessage(err.message);
+        } finally {
+            setSavingNotes(false);
         }
     }
 
@@ -129,17 +179,17 @@ function AdminBookingDetails() {
             );
 
             if (response.status === 401) {
-            localStorage.removeItem("token");
-            navigate("/admin/login");
-            return;
+                localStorage.removeItem("token");
+                navigate("/admin/login");
+                return;
             }
 
             const data = await response.json();
 
             if (!response.ok) {
-            throw new Error(
-                data.err || "Unable to resend confirmation email."
-            );
+                throw new Error(
+                    data.err || "Unable to resend confirmation email."
+                );
             }
 
             setBooking(data.bookingRequest);
@@ -163,7 +213,30 @@ function AdminBookingDetails() {
             <p>Event Date: {booking.event_date}</p>
             <p>Event Location: {booking.event_location}</p>
             <p>Guest Count: {booking.guest_count}</p>
+            <p>Service: {booking.service_name}</p>
             <p>Message: {booking.message}</p>
+
+            <h3>Admin Notes</h3>
+
+            <textarea
+                value={notes}
+                placeholder="Add internal notes about this booking..."
+                onChange={(event) => {
+                    setNotes(event.target.value);
+                }}
+            />
+
+            <button
+                type="button"
+                onClick={handleSaveNotes}
+                disabled={savingNotes}
+                >
+                {savingNotes ? "Saving..." : "Save Notes"}
+            </button>
+
+            {notesMessage && <p>{notesMessage}</p>}
+
+
             <p>Email Status: {booking.email_status}</p>
 
             <button
@@ -191,6 +264,11 @@ function AdminBookingDetails() {
                     <option value="declined">Declined</option>
                 </select>
             </label>
+
+            <br />
+            <Link to="/admin/dashboard">
+                Return to Dashboard
+            </Link>
 
             {updating && <p>Updating status...</p>}
 
