@@ -12,6 +12,7 @@ import Confirmation from './pages/Confirmation.jsx';
 import AdminLogin from './pages/AdminLogin.jsx';
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import AdminBookingDetails from "./pages/AdminBookingDetails.jsx";
+import AddAdmin from "./pages/AddAdmin.jsx";
 
 
 function App() {
@@ -46,6 +47,10 @@ function App() {
               Admin Dashboard
             </Link>{' '}
 
+            <Link to="/admin/add-admin">
+              Add Admin
+            </Link>
+
             <button onClick={handleLogout}>
               Log Out
             </button>
@@ -71,6 +76,7 @@ function App() {
         />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/bookings/:id" element={<AdminBookingDetails />} />
+        <Route path="/admin/add-admin" element={<AddAdmin />} />
       </Routes>
 
       <footer>

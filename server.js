@@ -9,7 +9,8 @@ const testJwtRouter = require('./controllers/test-jwt');
 const authController = require('./controllers/auth');
 const usersRouter = require('./controllers/users.js')
 const servicesRouter = require('./routes/services');
-const bookingRequestsRouter = require('./routes/bookingRequests.js')
+const bookingRequestsRouter = require('./routes/bookingRequests.js');
+const adminsRouter = require("./routes/admins");
 
 const app = express();
 
@@ -23,6 +24,7 @@ app.use('/test-jwt', testJwtRouter);
 app.use('/users', usersRouter);
 app.use('/api/services', servicesRouter);
 app.use('/api/booking-requests', bookingRequestsRouter);
+app.use("/api/admins", adminsRouter);
 
 
 app.get("/", (req, res) => {
