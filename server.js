@@ -11,6 +11,7 @@ const usersRouter = require('./controllers/users.js')
 const servicesRouter = require('./routes/services');
 const bookingRequestsRouter = require('./routes/bookingRequests.js');
 const adminsRouter = require("./routes/admins");
+const galleryRouter = require("./routes/gallery");
 
 const app = express();
 
@@ -25,6 +26,7 @@ app.use('/users', usersRouter);
 app.use('/api/services', servicesRouter);
 app.use('/api/booking-requests', bookingRequestsRouter);
 app.use("/api/admins", adminsRouter);
+app.use("/api/gallery", galleryRouter);
 
 
 app.get("/", (req, res) => {
