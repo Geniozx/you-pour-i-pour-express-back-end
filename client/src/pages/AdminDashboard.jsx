@@ -159,6 +159,7 @@ function AdminDashboard() {
                 <option value="new">New</option>
                 <option value="contacted">Contacted</option>
                 <option value="confirmed">Confirmed</option>
+                <option value="reserved">Reserved</option>
                 <option value="declined">Declined</option>
             </select>
 
@@ -207,6 +208,8 @@ function AdminDashboard() {
                 <p>Event Type: {booking.event_type}</p>
 
                 <p>Event Date: {booking.event_date}</p>
+
+                <p>Time: {booking.event_start_time} - {booking.event_end_time}</p>
 
                 <p>Guests: {booking.guest_count}</p>
 

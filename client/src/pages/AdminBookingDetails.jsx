@@ -211,6 +211,8 @@ function AdminBookingDetails() {
             <p>Phone: {booking.phone}</p>
             <p>Event Type: {booking.event_type}</p>
             <p>Event Date: {booking.event_date}</p>
+            <p><strong>Start Time:</strong> {booking.event_start_time}</p>
+            <p><strong>End Time:</strong> {booking.event_end_time}</p>
             <p>Event Location: {booking.event_location}</p>
             <p>Guest Count: {booking.guest_count}</p>
             <p>Service: {booking.service_name}</p>
@@ -261,6 +263,7 @@ function AdminBookingDetails() {
                     <option value="new">New</option>
                     <option value="contacted">Contacted</option>
                     <option value="confirmed">Confirmed</option>
+                    <option value="reserved">Reserved</option>
                     <option value="declined">Declined</option>
                 </select>
             </label>

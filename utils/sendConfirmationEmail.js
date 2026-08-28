@@ -23,6 +23,7 @@ Thank you for submitting your booking request to You Party - I Pour.
 Confirmation Number: ${bookingRequest.confirmation_number}
 
 Event Date: ${bookingRequest.event_date}
+Event Time: ${bookingRequest.event_start_time} - ${bookingRequest.event_end_time}
 Event Type: ${bookingRequest.event_type}
 Event Location: ${bookingRequest.event_location}
 Guest Count: ${bookingRequest.guest_count}

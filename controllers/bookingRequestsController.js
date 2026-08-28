@@ -14,6 +14,8 @@ async function createBookingRequest(req, res) {
       email,
       phone,
       event_date,
+      event_start_time,
+      event_end_time,
       event_type,
       event_location,
       guest_count,
@@ -44,6 +46,8 @@ async function createBookingRequest(req, res) {
       !cleanedEmail ||
       !cleanedPhone ||
       !event_date ||
+      !event_start_time ||
+      !event_end_time ||
       !cleanedEventType ||
       !cleanedEventLocation ||
       !guest_count ||
@@ -64,22 +68,64 @@ async function createBookingRequest(req, res) {
     }
 
     if (guest_count <= 0) {
-        return res.status(400).json({
-            err: "Guest count must be greater than 0."
-        });
+      return res.status(400).json({
+          err: "Guest count must be greater than 0."
+      });
     }
 
     const serviceResult = await pool.query(
-        "SELECT id FROM services WHERE id = $1",
-        [service_id]
+      "SELECT id FROM services WHERE id = $1",
+      [service_id]
     );
 
     const service = serviceResult.rows[0];
 
     if (!service) {
-        return res.status(400).json({
+      return res.status(400).json({
         err: "Invalid service."
-        });
+      });
+    }
+
+    if (event_end_time <= event_start_time) {
+      return res.status(400).json({
+        err: "Event end time must be after the start time."
+      });
+    }
+
+
+    const blackoutResult = await pool.query(
+      `SELECT id
+      FROM blackout_dates
+      WHERE $1::date BETWEEN start_date AND end_date
+      LIMIT 1`,
+      [event_date]
+    );
+
+    if (blackoutResult.rows.length > 0) {
+      return res.status(409).json({
+        err: "This date is unavailable. Please choose another date."
+      });
+    }
+
+    const conflictResult = await pool.query(
+      `SELECT id
+      FROM booking_requests
+      WHERE event_date = $1
+        AND status IN ('reserved', 'confirmed')
+        AND event_start_time < $3
+        AND event_end_time > $2
+      LIMIT 1`,
+      [
+        event_date,
+        event_start_time,
+        event_end_time
+      ]
+    );
+
+    if (conflictResult.rows.length > 0) {
+      return res.status(409).json({
+        err: "This time is unavailable. Please choose another time."
+      });
     }
 
     const confirmationNumber = generateConfirmationNumber();
@@ -90,6 +136,8 @@ async function createBookingRequest(req, res) {
         email,
         phone,
         event_date,
+        event_start_time,
+        event_end_time,
         event_type,
         event_location,
         guest_count,
@@ -97,12 +145,14 @@ async function createBookingRequest(req, res) {
         message,
         confirmation_number
       )
-      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
       RETURNING
         id,
         customer_name,
         email,
         event_date,
+        event_start_time,
+        event_end_time,
         event_type,
         event_location,
         guest_count,
@@ -113,6 +163,8 @@ async function createBookingRequest(req, res) {
         cleanedEmail,
         cleanedPhone,
         event_date,
+        event_start_time,
+        event_end_time,
         cleanedEventType,
         cleanedEventLocation,
         guest_count,
@@ -218,6 +270,7 @@ async function updateBookingRequestStatus(req, res) {
     const allowedStatuses = [
       "new",
       "contacted",
+      "reserved",
       "confirmed",
       "declined"
     ];
@@ -227,6 +280,66 @@ async function updateBookingRequestStatus(req, res) {
         err: "Invalid status."
       });
     }
+
+
+    if (status === "reserved" || status === "confirmed") {
+      const currentBookingResult = await pool.query(
+        `SELECT
+          id,
+          event_date,
+          event_start_time,
+          event_end_time
+        FROM booking_requests
+        WHERE id = $1`,
+        [req.params.id]
+      );
+
+      const currentBooking = currentBookingResult.rows[0];
+
+      if (!currentBooking) {
+        return res.status(404).json({
+          err: "Booking request not found."
+        });
+      }
+
+      const blackoutResult = await pool.query(
+        `SELECT id
+        FROM blackout_dates
+        WHERE $1::date BETWEEN start_date AND end_date
+        LIMIT 1`,
+        [currentBooking.event_date]
+      );
+
+      if (blackoutResult.rows.length > 0) {
+        return res.status(409).json({
+          err: "This booking falls on an unavailable date."
+        });
+      }
+
+      const conflictResult = await pool.query(
+        `SELECT id
+        FROM booking_requests
+        WHERE event_date = $1
+          AND status IN ('reserved', 'confirmed')
+          AND id <> $2
+          AND event_start_time < $4
+          AND event_end_time > $3
+        LIMIT 1`,
+        [
+          currentBooking.event_date,
+          currentBooking.id,
+          currentBooking.event_start_time,
+          currentBooking.event_end_time
+        ]
+      );
+
+      if (conflictResult.rows.length > 0) {
+        return res.status(409).json({
+          err: "This booking conflicts with another reserved or confirmed event."
+        });
+      }
+    }
+
 
     const bookingResult = await pool.query(
       `UPDATE booking_requests
@@ -342,11 +455,83 @@ async function resendConfirmationEmail(req, res) {
   }
 }
 
+
+async function checkBookingAvailability(req, res) {
+  try {
+    const {
+      event_date,
+      event_start_time,
+      event_end_time
+    } = req.body;
+
+    if (
+      !event_date ||
+      !event_start_time ||
+      !event_end_time
+    ) {
+      return res.status(400).json({
+        err: "Event date, start time, and end time are required."
+      });
+    }
+
+    if (event_end_time <= event_start_time) {
+      return res.status(400).json({
+        err: "Event end time must be after the start time."
+      });
+    }
+
+    const blackoutResult = await pool.query(
+      `SELECT id
+      FROM blackout_dates
+      WHERE $1::date BETWEEN start_date AND end_date
+      LIMIT 1`,
+      [event_date]
+    );
+
+    if (blackoutResult.rows.length > 0) {
+      return res.status(200).json({
+        available: false
+      });
+    }
+
+    const conflictResult = await pool.query(
+      `SELECT id
+      FROM booking_requests
+      WHERE event_date = $1
+        AND status IN ('reserved', 'confirmed')
+        AND event_start_time < $3
+        AND event_end_time > $2
+      LIMIT 1`,
+      [
+        event_date,
+        event_start_time,
+        event_end_time
+      ]
+    );
+
+    if (conflictResult.rows.length > 0) {
+      return res.status(200).json({
+        available: false
+      });
+    }
+
+    res.status(200).json({
+      available: true
+    });
+  } catch (err) {
+    res.status(500).json({
+      err: err.message
+    });
+  }
+}
+
+
 module.exports = {
   createBookingRequest,
   getAllBookingRequests,
   getBookingRequestById,
   updateBookingRequestStatus,
   resendConfirmationEmail,
-  updateBookingRequestNotes
+  updateBookingRequestNotes,
+  checkBookingAvailability
 };

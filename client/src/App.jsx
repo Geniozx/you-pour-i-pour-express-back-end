@@ -13,6 +13,7 @@ import AdminLogin from './pages/AdminLogin.jsx';
 import AdminDashboard from "./pages/AdminDashboard.jsx";
 import AdminBookingDetails from "./pages/AdminBookingDetails.jsx";
 import AddAdmin from "./pages/AddAdmin.jsx";
+import AdminCalendar from "./pages/AdminCalendar";
 
 
 function App() {
@@ -51,6 +52,10 @@ function App() {
               Add Admin
             </Link>
 
+            <Link to="/admin/calendar">
+              Calendar 
+            </Link>
+
             <button onClick={handleLogout}>
               Log Out
             </button>
@@ -77,6 +82,7 @@ function App() {
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/bookings/:id" element={<AdminBookingDetails />} />
         <Route path="/admin/add-admin" element={<AddAdmin />} />
+        <Route path="/admin/calendar" element={<AdminCalendar />} />
       </Routes>
 
       <footer>

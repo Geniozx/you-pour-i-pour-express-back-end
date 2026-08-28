@@ -15,6 +15,10 @@ function RequestQuote() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
+  const [eventStartTime, setEventStartTime] = useState("");
+  const [eventEndTime, setEventEndTime] = useState("");
+  const [availability, setAvailability] = useState(null);
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
   
 
   const [submitting, setSubmitting] = useState(false);
@@ -42,6 +46,8 @@ function RequestQuote() {
         email,
         phone,
         event_date: eventDate,
+        event_start_time: eventStartTime,
+        event_end_time: eventEndTime,
         event_type: eventType,
         event_location: eventLocation,
         guest_count: Number(guestCount),
@@ -109,6 +115,63 @@ function RequestQuote() {
     }, []);
 
 
+    useEffect(() => {
+      async function checkAvailability() {
+        if (
+          !eventDate ||
+          !eventStartTime ||
+          !eventEndTime
+        ) {
+          setAvailability(null);
+          return;
+        }
+
+        if (eventEndTime <= eventStartTime) {
+          setAvailability(null);
+          return;
+        }
+
+        try {
+          setCheckingAvailability(true);
+          setAvailability(null);
+
+          const response = await fetch(
+            "http://localhost:3000/api/booking-requests/availability",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json"
+              },
+              body: JSON.stringify({
+                event_date: eventDate,
+                event_start_time: eventStartTime,
+                event_end_time: eventEndTime
+              })
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Could not check availability.");
+          }
+
+          const data = await response.json();
+
+          setAvailability(data.available);
+        } catch (err) {
+          setError(err.message);
+          setAvailability(null);
+        } finally {
+          setCheckingAvailability(false);
+        }
+      }
+
+      checkAvailability();
+    }, [
+      eventDate,
+      eventStartTime,
+      eventEndTime
+    ]);
+
 
   return (
     <div>
@@ -150,6 +213,40 @@ function RequestQuote() {
           required
         />
 
+
+        <label>
+          Event Start Time
+          <input
+            type="time"
+            value={eventStartTime}
+            onChange={(event) => setEventStartTime(event.target.value)}
+            required
+          />
+        </label>
+
+        <label>
+          Event End Time
+          <input
+            type="time"
+            value={eventEndTime}
+            onChange={(event) => setEventEndTime(event.target.value)}
+            required
+          />
+        </label>
+
+        {checkingAvailability && (
+          <p>Checking availability...</p>
+        )}
+
+        {availability === true && (
+          <p>This date and time is available.</p>
+        )}
+
+        {availability === false && (
+          <p>
+            This date or time is unavailable. Please choose another.
+          </p>
+        )}
 
         <label>Phone: </label>
         <input
@@ -240,9 +337,14 @@ function RequestQuote() {
           required
         />
 
+        <br />
         <button 
           type="submit"
-          disabled={submitting}
+          disabled={
+            submitting ||
+            checkingAvailability ||
+            availability === false
+          }
         > 
           {submitting ? "Submitting..." : "Request Quote"} 
         </button>

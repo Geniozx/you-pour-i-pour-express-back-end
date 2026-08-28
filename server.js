@@ -7,11 +7,12 @@ const logger = require('morgan');
 
 const testJwtRouter = require('./controllers/test-jwt');
 const authController = require('./controllers/auth');
-const usersRouter = require('./controllers/users.js')
+const usersRouter = require('./controllers/users')
 const servicesRouter = require('./routes/services');
-const bookingRequestsRouter = require('./routes/bookingRequests.js');
+const bookingRequestsRouter = require('./routes/bookingRequests');
 const adminsRouter = require("./routes/admins");
 const galleryRouter = require("./routes/gallery");
+const blackoutDatesRouter = require("./routes/blackoutDates")
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/api/services', servicesRouter);
 app.use('/api/booking-requests', bookingRequestsRouter);
 app.use("/api/admins", adminsRouter);
 app.use("/api/gallery", galleryRouter);
+app.use("/api/blackout-dates", blackoutDatesRouter);
 
 
 app.get("/", (req, res) => {
