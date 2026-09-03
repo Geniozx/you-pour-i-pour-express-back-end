@@ -16,6 +16,28 @@ function AdminBookingDetails() {
     const { id } = useParams();
     const navigate = useNavigate();
 
+
+    function formatDate(date) {
+        if (!date) {
+            return "";
+        }
+
+        return date.split("T")[0];
+        }
+
+        function formatTime(time) {
+        if (!time) {
+            return "";
+        }
+
+        const [hours, minutes] = time.split(":");
+        const hour = Number(hours);
+        const period = hour >= 12 ? "PM" : "AM";
+        const formattedHour = hour % 12 || 12;
+
+        return `${formattedHour}:${minutes} ${period}`;
+    }
+
     useEffect(() => {
         async function fetchBooking() {
             const token = localStorage.getItem("token");
@@ -27,7 +49,7 @@ function AdminBookingDetails() {
 
             try {
                 const response = await fetch(
-                    `http://localhost:3000/api/booking-requests/${id}`,
+                    `/api/booking-requests/${id}`,
                     {
                     headers: {
                         Authorization: `Bearer ${token}`
@@ -80,7 +102,7 @@ function AdminBookingDetails() {
 
         try {
             const response = await fetch(
-            `http://localhost:3000/api/booking-requests/${id}`,
+            `/api/booking-requests/${id}`,
             {
                 method: "PATCH",
                 headers: {
@@ -123,7 +145,7 @@ function AdminBookingDetails() {
 
         try {
             const response = await fetch(
-            `http://localhost:3000/api/booking-requests/${id}/notes`,
+            `/api/booking-requests/${id}/notes`,
             {
                 method: "PATCH",
                 headers: {
@@ -169,7 +191,7 @@ function AdminBookingDetails() {
 
         try {
             const response = await fetch(
-            `http://localhost:3000/api/booking-requests/${id}/resend-confirmation`,
+            `/api/booking-requests/${id}/resend-confirmation`,
             {
                 method: "POST",
                 headers: {
@@ -202,80 +224,170 @@ function AdminBookingDetails() {
     }
 
     return (
-        <div>
-            <h2>Booking Request Details</h2>
+        <div className="admin-booking-page">
+            <section className="admin-booking-header">
+            <p className="admin-eyebrow">
+                Booking Request
+            </p>
 
-            <p>Confirmation: {booking.confirmation_number}</p>
-            <p>Name: {booking.customer_name}</p>
-            <p>Email: {booking.email}</p>
-            <p>Phone: {booking.phone}</p>
-            <p>Event Type: {booking.event_type}</p>
-            <p>Event Date: {booking.event_date}</p>
-            <p><strong>Start Time:</strong> {booking.event_start_time}</p>
-            <p><strong>End Time:</strong> {booking.event_end_time}</p>
-            <p>Event Location: {booking.event_location}</p>
-            <p>Guest Count: {booking.guest_count}</p>
-            <p>Service: {booking.service_name}</p>
-            <p>Message: {booking.message}</p>
+            <h2 className="admin-booking-title">
+                {booking.customer_name}
+            </h2>
 
-            <h3>Admin Notes</h3>
+            <p className="admin-booking-confirmation">
+                Confirmation: {booking.confirmation_number}
+            </p>
+            </section>
 
-            <textarea
+            <section className="admin-booking-info">
+            <div className="admin-booking-info-item">
+                <span>Email</span>
+                <p>{booking.email}</p>
+            </div>
+
+            <div className="admin-booking-info-item">
+                <span>Phone</span>
+                <p>{booking.phone}</p>
+            </div>
+
+            <div className="admin-booking-info-item">
+                <span>Event Type</span>
+                <p>{booking.event_type}</p>
+            </div>
+
+            <div className="admin-booking-info-item">
+                <span>Event Date</span>
+                <p>{formatDate(booking.event_date)}</p>
+            </div>
+
+            <div className="admin-booking-info-item">
+                <span>Start Time</span>
+                <p>{formatTime(booking.event_start_time)}</p>
+            </div>
+
+            <div className="admin-booking-info-item">
+                <span>End Time</span>
+                <p>{formatTime(booking.event_end_time)}</p>
+            </div>
+
+            <div className="admin-booking-info-item">
+                <span>Event Location</span>
+                <p>{booking.event_location}</p>
+            </div>
+
+            <div className="admin-booking-info-item">
+                <span>Guest Count</span>
+                <p>{booking.guest_count}</p>
+            </div>
+
+            <div className="admin-booking-info-item">
+                <span>Service</span>
+                <p>{booking.service_name}</p>
+            </div>
+
+            <div className="admin-booking-info-item">
+                <span>Email Status</span>
+                <p>{booking.email_status}</p>
+            </div>
+
+            <div className="admin-booking-info-item admin-booking-message">
+                <span>Customer Message</span>
+                <p>{booking.message}</p>
+            </div>
+            </section>
+
+            <section className="admin-booking-actions">
+            <div className="admin-action-section">
+                <h3>Booking Status</h3>
+
+                <select
+                className="admin-status-select"
+                value={booking.status}
+                onChange={handleStatusChange}
+                disabled={updating}
+                >
+                <option value="new">New</option>
+                <option value="contacted">Contacted</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="reserved">Reserved</option>
+                <option value="declined">Declined</option>
+                </select>
+
+                {updating && (
+                <p className="admin-action-message">
+                    Updating status...
+                </p>
+                )}
+
+                {statusMessage && (
+                <p className="admin-action-message">
+                    {statusMessage}
+                </p>
+                )}
+            </div>
+
+            <div className="admin-action-section">
+                <h3>Admin Notes</h3>
+
+                <textarea
+                className="admin-notes-textarea"
                 value={notes}
                 placeholder="Add internal notes about this booking..."
                 onChange={(event) => {
                     setNotes(event.target.value);
                 }}
-            />
+                />
 
-            <button
+                <button
+                className="admin-action-button"
                 type="button"
                 onClick={handleSaveNotes}
                 disabled={savingNotes}
                 >
-                {savingNotes ? "Saving..." : "Save Notes"}
-            </button>
+                {savingNotes ? "Saving..." : "Save Notes →"}
+                </button>
 
-            {notesMessage && <p>{notesMessage}</p>}
+                {notesMessage && (
+                <p className="admin-action-message">
+                    {notesMessage}
+                </p>
+                )}
+            </div>
 
+            <div className="admin-action-section">
+                <h3>Email Confirmation</h3>
 
-            <p>Email Status: {booking.email_status}</p>
+                <p className="admin-email-status">
+                Current Status: {booking.email_status}
+                </p>
 
-            <button
+                <button
+                className="admin-action-button"
                 type="button"
                 onClick={handleResendConfirmation}
                 disabled={resending}
-            >
+                >
                 {resending
                     ? "Resending..."
-                    : "Resend Confirmation Email"}
-            </button>
+                    : "Resend Confirmation Email →"}
+                </button>
 
-            {emailMessage && <p>{emailMessage}</p>}
+                {emailMessage && (
+                <p className="admin-action-message">
+                    {emailMessage}
+                </p>
+                )}
+            </div>
+            </section>
 
-            <label>
-                Status:{" "}
-                <select
-                    value={booking.status}
-                    onChange={handleStatusChange}
-                    disabled={updating}
-                >
-                    <option value="new">New</option>
-                    <option value="contacted">Contacted</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="reserved">Reserved</option>
-                    <option value="declined">Declined</option>
-                </select>
-            </label>
-
-            <br />
-            <Link to="/admin/dashboard">
-                Return to Dashboard
+            <div className="admin-booking-footer">
+            <Link
+                className="admin-return-link"
+                to="/admin/dashboard"
+            >
+                ← Return to Dashboard
             </Link>
-
-            {updating && <p>Updating status...</p>}
-
-            {statusMessage && <p>{statusMessage}</p>}
+            </div>
         </div>
     );
 }

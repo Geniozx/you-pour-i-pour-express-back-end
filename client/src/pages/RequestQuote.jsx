@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 
 function RequestQuote() {
   const [searchParams] = useSearchParams();
+  const selectedService = searchParams.get("service");
+
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [eventDate, setEventDate] = useState("");
@@ -11,7 +13,9 @@ function RequestQuote() {
   const [eventLocation, setEventLocation] = useState("");
   const [guestCount, setGuestCount] = useState("");
   const [services, setServices] = useState([]);
-  const [serviceId, setServiceId] = useState("");
+  const [serviceId, setServiceId] = useState(
+    selectedService || ""
+  );
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -24,14 +28,8 @@ function RequestQuote() {
   const [submitting, setSubmitting] = useState(false);
 
   const navigate = useNavigate();
-  const selectedService = searchParams.get("service");
   const today = new Date().toISOString().split("T")[0];
 
-    useEffect(() => {
-      if (selectedService) {
-        setServiceId(selectedService);
-      }
-    }, [selectedService]);
 
     async function handleSubmit(event) {
       event.preventDefault();
@@ -58,7 +56,7 @@ function RequestQuote() {
 
       try {
         const response = await fetch(
-        "http://localhost:3000/api/booking-requests",
+        "/api/booking-requests",
         {
           method: "POST",
           headers: {
@@ -83,7 +81,11 @@ function RequestQuote() {
       });
 
     } catch (err) {
-        setError(err.message);
+        console.error("Quote submission error:", err);
+
+        setError(
+          "We were unable to submit your request. Please try again."
+        );
       } finally {
         setSubmitting(false);
       }
@@ -95,7 +97,7 @@ function RequestQuote() {
       async function fetchServices() {
       try {
         const response = await fetch(
-          "http://localhost:3000/api/services"
+          "/api/services"
         );
 
         if (!response.ok) {
@@ -106,7 +108,11 @@ function RequestQuote() {
 
         setServices(data);
       } catch (err) {
-        setError(err.message);
+        console.error(err);
+
+        setError(
+          "We were unable to load the available services."
+        )
       } finally {
         setLoading(false);
       }
@@ -136,7 +142,7 @@ function RequestQuote() {
           setAvailability(null);
 
           const response = await fetch(
-            "http://localhost:3000/api/booking-requests/availability",
+            "/api/booking-requests/availability",
             {
               method: "POST",
               headers: {
@@ -158,7 +164,12 @@ function RequestQuote() {
 
           setAvailability(data.available);
         } catch (err) {
-          setError(err.message);
+          console.error(err);
+
+          setError(
+            "We were unable to check availability at this time."
+          );
+
           setAvailability(null);
         } finally {
           setCheckingAvailability(false);
@@ -174,184 +185,302 @@ function RequestQuote() {
 
 
   return (
-    <div>
-      <h2>Request A Quote</h2>
+    <div className="quote-page">
+      <section className="quote-header">
+        <p className="quote-eyebrow">
+          Request a Quote
+        </p>
 
-      <form onSubmit={handleSubmit}>
-        <label>Name: </label>
-        <input 
-          type="text"
-          value={name}
-          placeholder="Enter Name"
-          onChange={(event) => {
-            setName(event.target.value);
-          }}
-          required
-        />
+        <h2 className="quote-title">
+          Tell Us About Your Event
+        </h2>
+      </section>
 
+      <form
+        className="quote-form"
+        onSubmit={handleSubmit}
+      >
+        <section className="quote-form-section">
+          <div className="quote-form-grid">
+            <div className="quote-field">
+              <label htmlFor="quote-name">
+                Name
+              </label>
 
-        <label>Email: </label>
-        <input
-          type="email"
-          value={email}
-          placeholder="Enter Email"
-          onChange={(event) => {
-            setEmail(event.target.value);
-          }}
-          required
-        />
+              <input
+                id="quote-name"
+                type="text"
+                value={name}
+                placeholder="Enter Name"
+                onChange={(event) => {
+                  setName(event.target.value);
+                }}
+                required
+              />
+            </div>
 
+            <div className="quote-field">
+              <label htmlFor="quote-email">
+                Email
+              </label>
 
-        <label>Event Date: </label>
-        <input 
-          type="date"
-          min={today}
-          value={eventDate}
-          onChange={(event) => {
-            setEventDate(event.target.value);
-          }}
-          required
-        />
+              <input
+                id="quote-email"
+                type="email"
+                value={email}
+                placeholder="Enter Email"
+                onChange={(event) => {
+                  setEmail(event.target.value);
+                }}
+                required
+              />
+            </div>
 
+            <div className="quote-field">
+              <label htmlFor="quote-phone">
+                Phone
+              </label>
 
-        <label>
-          Event Start Time
-          <input
-            type="time"
-            value={eventStartTime}
-            onChange={(event) => setEventStartTime(event.target.value)}
-            required
-          />
-        </label>
+              <input
+                id="quote-phone"
+                type="tel"
+                value={phone}
+                placeholder="Enter Phone Number"
+                onChange={(event) => {
+                  setPhone(event.target.value);
+                }}
+                required
+              />
+            </div>
 
-        <label>
-          Event End Time
-          <input
-            type="time"
-            value={eventEndTime}
-            onChange={(event) => setEventEndTime(event.target.value)}
-            required
-          />
-        </label>
+            <div className="quote-field">
+              <label htmlFor="quote-event-type">
+                Event Type
+              </label>
 
-        {checkingAvailability && (
-          <p>Checking availability...</p>
-        )}
+              <select
+                id="quote-event-type"
+                value={eventType}
+                onChange={(event) => {
+                  setEventType(event.target.value);
+                }}
+                required
+              >
+                <option value="">
+                  Select Event Type
+                </option>
+                <option value="Wedding">
+                  Wedding
+                </option>
+                <option value="Birthday">
+                  Birthday
+                </option>
+                <option value="Corporate Event">
+                  Corporate Event
+                </option>
+                <option value="Private Party">
+                  Private Party
+                </option>
+                <option value="Other">
+                  Other
+                </option>
+              </select>
+            </div>
+          </div>
+        </section>
 
-        {availability === true && (
-          <p>This date and time is available.</p>
-        )}
+        <section className="quote-form-section">
+          <div className="quote-section-heading">
+            <h3>Event Details</h3>
+          </div>
 
-        {availability === false && (
-          <p>
-            This date or time is unavailable. Please choose another.
-          </p>
-        )}
+          <div className="quote-form-grid">
+            <div className="quote-field">
+              <label htmlFor="quote-event-date">
+                Event Date
+              </label>
 
-        <label>Phone: </label>
-        <input
-          type="tel"
-          value={phone}
-          placeholder="Enter Phone Number"
-          onChange={(event) => {
-            setPhone(event.target.value)
-          }}
-          required
-        />
+              <input
+                id="quote-event-date"
+                type="date"
+                min={today}
+                value={eventDate}
+                onChange={(event) => {
+                  setEventDate(event.target.value);
+                }}
+                required
+              />
+            </div>
 
+            <div className="quote-field">
+              <label htmlFor="quote-start-time">
+                Event Start Time
+              </label>
 
-        <label>Event Type: </label>
-        <select 
-          value={eventType}
-          onChange={(event) => {
-            setEventType(event.target.value);
-          }}
-          required
-        >
-          <option value="">Select Event Type</option>
-          <option value="Wedding">Wedding</option>
-          <option value="Birthday">Birthday</option>
-          <option value="Corporate Event">Corporate Event</option>
-          <option value="Private Party">Private Party</option>
-          <option value="Other">Other</option>
-        </select>
+              <input
+                id="quote-start-time"
+                type="time"
+                value={eventStartTime}
+                onChange={(event) =>
+                  setEventStartTime(event.target.value)
+                }
+                required
+              />
+            </div>
 
+            <div className="quote-field">
+              <label htmlFor="quote-end-time">
+                Event End Time
+              </label>
 
-        <label>Event Location: </label>
-        <input
-          type="text"
-          value={eventLocation}
-          placeholder="Enter Address"
-          onChange={(event) => {
-            setEventLocation(event.target.value);
-          }}
-          required
-        />
+              <input
+                id="quote-end-time"
+                type="time"
+                value={eventEndTime}
+                onChange={(event) =>
+                  setEventEndTime(event.target.value)
+                }
+                required
+              />
+            </div>
 
+            <div className="quote-field">
+              <label htmlFor="quote-location">
+                Event Location
+              </label>
 
-        <label>Guest Count: </label>
-        <input 
-          type="number"
-          min="1"
-          value={guestCount}
-          placeholder="How Many Guests?"
-          onChange={(event) => {
-            setGuestCount(event.target.value);
-          }}
-          required
-        />
-        {guestCount !== "" && Number(guestCount) <= 0 && (
-          <p>Guest count must be greater than 0.</p>
-        )}
+              <input
+                id="quote-location"
+                type="text"
+                value={eventLocation}
+                placeholder="Enter Address"
+                onChange={(event) => {
+                  setEventLocation(event.target.value);
+                }}
+                required
+              />
+            </div>
 
+            <div className="quote-field">
+              <label htmlFor="quote-guest-count">
+                Guest Count
+              </label>
 
-        <label>Services Package: </label>
-        <select 
-          value={serviceId}
-          onChange={(event) => {
-            setServiceId(event.target.value);
-          }}
-          required
-        >
-          <option value="">Select a Service</option>
+              <input
+                id="quote-guest-count"
+                type="number"
+                min="1"
+                value={guestCount}
+                placeholder="How Many Guests?"
+                onChange={(event) => {
+                  setGuestCount(event.target.value);
+                }}
+                required
+              />
 
-          {services.map((service) => (
-            <option
-              key={service.id}
-              value={service.id}
-            >
-              {service.name}
-            </option>
-          ))}
-        </select>
-        {loading && <p>Loading services...</p>}
+              {guestCount !== "" &&
+                Number(guestCount) <= 0 && (
+                  <p className="quote-field-message quote-error">
+                    Guest count must be greater than 0.
+                  </p>
+                )}
+            </div>
 
+            <div className="quote-field">
+              <label htmlFor="quote-service">
+                Service Package
+              </label>
 
-        <label>Message: </label>
-        <textarea
-          value={message}
-          placeholder="Tell us about your event"
-          onChange={(event) => {
-            setMessage(event.target.value);
-          }}
-          required
-        />
+              <select
+                id="quote-service"
+                value={serviceId}
+                onChange={(event) => {
+                  setServiceId(event.target.value);
+                }}
+                required
+              >
+                <option value="">
+                  Select a Service
+                </option>
 
-        <br />
-        <button 
-          type="submit"
-          disabled={
-            submitting ||
-            checkingAvailability ||
-            availability === false
-          }
-        > 
-          {submitting ? "Submitting..." : "Request Quote"} 
-        </button>
+                {services.map((service) => (
+                  <option
+                    key={service.id}
+                    value={service.id}
+                  >
+                    {service.name}
+                  </option>
+                ))}
+              </select>
+
+              {loading && (
+                <p className="quote-field-message">
+                  Loading services...
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="quote-availability">
+            {checkingAvailability && (
+              <p>Checking availability...</p>
+            )}
+
+            {availability === true && (
+              <p className="quote-available">
+                This date and time is available.
+              </p>
+            )}
+
+            {availability === false && (
+              <p className="quote-unavailable">
+                This date or time is unavailable.
+                Please choose another.
+              </p>
+            )}
+          </div>
+        </section>
+
+        <section className="quote-form-section">
+          <div className="quote-field quote-message-field">
+            <label htmlFor="quote-message">
+              Tell Us About Your Event
+            </label>
+
+            <textarea
+              id="quote-message"
+              value={message}
+              placeholder="Tell us about your event"
+              onChange={(event) => {
+                setMessage(event.target.value);
+              }}
+              required
+            />
+          </div>
+        </section>
+
+        <div className="quote-form-footer">
+          <button
+            className="quote-submit-button"
+            type="submit"
+            disabled={
+              submitting ||
+              checkingAvailability ||
+              availability === false
+            }
+          >
+            {submitting
+              ? "Submitting..."
+              : "Request Quote →"}
+          </button>
+        </div>
       </form>
 
-      
-      {error && <p>{error}</p>}
+      {error && (
+        <p className="quote-page-error">
+          {error}
+        </p>
+      )}
     </div>
   );
 }

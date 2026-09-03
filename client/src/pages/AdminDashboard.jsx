@@ -12,6 +12,30 @@ function AdminDashboard() {
 
     const navigate = useNavigate();
 
+    function formatDate(date) {
+        if (!date) {
+            return "";
+        }
+
+        return date.split("T")[0];
+        }
+
+        function formatTime(time) {
+        if (!time) {
+            return "";
+        }
+
+        const [hours, minutes] = time.split(":");
+
+        const hour = Number(hours);
+
+        const period = hour >= 12 ? "PM" : "AM";
+
+        const formattedHour = hour % 12 || 12;
+
+        return `${formattedHour}:${minutes} ${period}`;
+    }
+
     useEffect(() => {
         async function fetchBookings() {
         const token = localStorage.getItem("token");
@@ -23,7 +47,7 @@ function AdminDashboard() {
 
         try {
             const response = await fetch(
-            "http://localhost:3000/api/booking-requests",
+            "/api/booking-requests",
             {
                 headers: {
                 Authorization: `Bearer ${token}`
@@ -116,112 +140,195 @@ function AdminDashboard() {
             (booking) => booking.email_status === "failed"
         ).length;
 
+
+
+
     return (
-        <div>
-        <h2>Admin Dashboard</h2>
+        <div className="admin-dashboard-page">
+            <section className="admin-dashboard-header">
+            <p className="admin-eyebrow">
+                Administration
+            </p>
 
-        <div>
-            <h3>Overview</h3>
+            <h2 className="admin-dashboard-title">
+                Dashboard
+            </h2>
+            </section>
 
-            <p>Total Requests: {bookings.length}</p>
-            <p>New: {newCount}</p>
-            <p>Contacted: {contactedCount}</p>
-            <p>Confirmed: {confirmedCount}</p>
-            <p>Declined: {declinedCount}</p>
-            <p>Failed Emails: {failedEmailCount}</p>
-        </div>
+            <section className="admin-overview">
+            <div className="admin-overview-item">
+                <span>Total Requests</span>
+                <strong>{bookings.length}</strong>
+            </div>
 
-        <h3>Booking Requests</h3>
+            <div className="admin-overview-item">
+                <span>New</span>
+                <strong>{newCount}</strong>
+            </div>
 
-        {error && <p>{error}</p>}
+            <div className="admin-overview-item">
+                <span>Contacted</span>
+                <strong>{contactedCount}</strong>
+            </div>
 
-        {bookings.length === 0 && !error && (
-            <p>No booking requests found.</p>
-        )}
+            <div className="admin-overview-item">
+                <span>Confirmed</span>
+                <strong>{confirmedCount}</strong>
+            </div>
 
-        <div>
-            <input
+            <div className="admin-overview-item">
+                <span>Declined</span>
+                <strong>{declinedCount}</strong>
+            </div>
+
+            <div className="admin-overview-item">
+                <span>Failed Emails</span>
+                <strong>{failedEmailCount}</strong>
+            </div>
+            </section>
+
+            <section className="admin-bookings-section">
+            <div className="admin-section-header">
+                <h3>Booking Requests</h3>
+            </div>
+
+            {error && (
+                <p className="admin-status-message admin-error">
+                {error}
+                </p>
+            )}
+
+            {bookings.length === 0 && !error && (
+                <p className="admin-status-message">
+                No booking requests found.
+                </p>
+            )}
+
+            <div className="admin-filters">
+                <input
+                className="admin-search-input"
                 type="text"
                 value={search}
                 placeholder="Search name, email, or confirmation number"
                 onChange={(event) => {
-                setSearch(event.target.value);
+                    setSearch(event.target.value);
                 }}
-            />
+                />
 
-            <select
+                <select
                 value={statusFilter}
                 onChange={(event) => {
-                setStatusFilter(event.target.value);
+                    setStatusFilter(event.target.value);
                 }}
-            >
+                >
                 <option value="all">All Statuses</option>
                 <option value="new">New</option>
                 <option value="contacted">Contacted</option>
                 <option value="confirmed">Confirmed</option>
                 <option value="reserved">Reserved</option>
                 <option value="declined">Declined</option>
-            </select>
+                </select>
 
-            <select
+                <select
                 value={emailFilter}
                 onChange={(event) => {
-                setEmailFilter(event.target.value);
+                    setEmailFilter(event.target.value);
                 }}
-            >
+                >
                 <option value="all">All Email Statuses</option>
                 <option value="sent">Email Sent</option>
                 <option value="failed">Email Failed</option>
                 <option value="pending">Email Pending</option>
-            </select>
+                </select>
 
-            <select
+                <select
                 value={sortBy}
                 onChange={(event) => {
-                setSortBy(event.target.value);
+                    setSortBy(event.target.value);
                 }}
-            >
+                >
                 <option value="newest">Newest Requests</option>
                 <option value="event-date">Upcoming Event Date</option>
-            </select>
-        </div>
-
-
-        {filteredBookings.length === 0 && (
-            <p>No matching booking requests.</p>
-        )}
-
-        {filteredBookings.map((booking) => (
-            <div key={booking.id}>
-                <h4>{booking.customer_name}</h4>
-
-                <p>
-                    Confirmation: {booking.confirmation_number}
-                </p>
-
-                <Link to={`/admin/bookings/${booking.id}`}>
-                    View Details
-                </Link>
-
-                <p>Email: {booking.email}</p>
-
-                <p>Event Type: {booking.event_type}</p>
-
-                <p>Event Date: {booking.event_date}</p>
-
-                <p>Time: {booking.event_start_time} - {booking.event_end_time}</p>
-
-                <p>Guests: {booking.guest_count}</p>
-
-                <p>Service: {booking.service_name}</p>
-
-                <p>Status: {booking.status}</p>
-
-                <p>Email Status: {booking.email_status}</p>
+                </select>
             </div>
-        ))}
+
+            {filteredBookings.length === 0 && (
+                <p className="admin-status-message">
+                No matching booking requests.
+                </p>
+            )}
+
+            <div className="admin-booking-list">
+                {filteredBookings.map((booking) => (
+                <article
+                    key={booking.id}
+                    className="admin-booking-item"
+                >
+                    <div className="admin-booking-heading">
+                    <div>
+                        <h4>{booking.customer_name}</h4>
+
+                        <p>
+                        Confirmation: {booking.confirmation_number}
+                        </p>
+                    </div>
+
+                    <Link
+                        className="admin-booking-link"
+                        to={`/admin/bookings/${booking.id}`}
+                    >
+                        View Details →
+                    </Link>
+                    </div>
+
+                    <div className="admin-booking-details">
+                    <p>
+                        <span>Email</span>
+                        {booking.email}
+                    </p>
+
+                    <p>
+                        <span>Event Type</span>
+                        {booking.event_type}
+                    </p>
+
+                    <p>
+                        <span>Event Date</span>
+                        {formatDate(booking.event_date)}
+                    </p>
+
+                    <p>
+                        <span>Time</span>
+                        {formatTime(booking.event_start_time)} -{" "}
+                        {formatTime(booking.event_end_time)}
+                    </p>
+
+                    <p>
+                        <span>Guests</span>
+                        {booking.guest_count}
+                    </p>
+
+                    <p>
+                        <span>Service</span>
+                        {booking.service_name}
+                    </p>
+
+                    <p>
+                        <span>Status</span>
+                        {booking.status}
+                    </p>
+
+                    <p>
+                        <span>Email Status</span>
+                        {booking.email_status}
+                    </p>
+                    </div>
+                </article>
+                ))}
+            </div>
+            </section>
         </div>
-    );
+        );
 }
 
 export default AdminDashboard;

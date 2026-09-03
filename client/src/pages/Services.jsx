@@ -10,7 +10,7 @@ function Services() {
     async function fetchServices() {
       try {
         const response = await fetch(
-          "http://localhost:3000/api/services"
+          "/api/services"
         );
 
         if (!response.ok) {
@@ -31,25 +31,52 @@ function Services() {
 
 
   return (
-    <div>
-      <h2>Services</h2>
+    <div className="services-page">
+      <section className="services-header">
+        <h2 className="services-title">Services</h2>
+      </section>
 
-      {loading && <p>Loading services...</p>}
-      {error && <p>{error}</p>}
+      {loading && (
+        <p className="services-status">
+          Loading services...
+        </p>
+      )}
 
-      {services.map((service) => (
-        // JSX
-        <div key={service.id}>
-          <h3>{service.name}</h3>
-          <p>{service.description}</p>
-          <p>${service.price}</p>
-        
+      {error && (
+        <p className="services-error">
+          {error}
+        </p>
+      )}
 
-          <Link to={`/services/${service.id}`}>
-            View Details 
-          </Link>
-        </div>
-      ))}
+      <section className="services-grid">
+        {services.map((service) => (
+          <article
+            className="service-card"
+            key={service.id}
+          >
+            <div className="service-card-content">
+              <h3 className="service-card-title">
+                {service.name}
+              </h3>
+
+              <p className="service-card-description">
+                {service.description}
+              </p>
+
+              <p className="service-card-price">
+                ${service.price}
+              </p>
+
+              <Link
+                className="service-card-link"
+                to={`/services/${service.id}`}
+              >
+                View Details →
+              </Link>
+            </div>
+          </article>
+        ))}
+      </section>
     </div>
   );
 }

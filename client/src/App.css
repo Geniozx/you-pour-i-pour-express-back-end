@@ -1,221 +1,2731 @@
-.counter {
-  font-size: 16px;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: var(--accent);
-  background: var(--accent-bg);
-  border: 2px solid transparent;
-  transition: border-color 0.3s;
-  margin-bottom: 24px;
+/* =========================
+   App Layout
+========================= */
 
-  &:hover {
-    border-color: var(--accent-border);
-  }
-  &:focus-visible {
-    outline: 2px solid var(--accent);
-    outline-offset: 2px;
-  }
-}
-
-.hero {
-  position: relative;
-
-  .base,
-  .framework,
-  .vite {
-    inset-inline: 0;
-    margin: 0 auto;
-  }
-
-  .base {
-    width: 170px;
-    position: relative;
-    z-index: 0;
-  }
-
-  .framework,
-  .vite {
-    position: absolute;
-  }
-
-  .framework {
-    z-index: 1;
-    top: 34px;
-    height: 28px;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(44deg) rotateY(39deg)
-      scale(1.4);
-  }
-
-  .vite {
-    z-index: 0;
-    top: 107px;
-    height: 26px;
-    width: auto;
-    transform: perspective(2000px) rotateZ(300deg) rotateX(40deg) rotateY(39deg)
-      scale(0.8);
-  }
-}
-
-#center {
+.app {
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  gap: 25px;
-  place-content: center;
-  place-items: center;
-  flex-grow: 1;
-
-  @media (max-width: 1024px) {
-    padding: 32px 20px 24px;
-    gap: 18px;
-  }
 }
 
-#next-steps {
+.main-content {
+  flex: 1;
+  width: 100%;
+  padding: 2rem 1.5rem 3rem;
+}
+
+
+/* =========================
+   Header
+========================= */
+
+.site-header {
+  width: 100%;
+  padding: 1.25rem 1.5rem;
+
   display: flex;
-  border-top: 1px solid var(--border);
-  text-align: left;
+  align-items: center;
 
-  & > div {
-    flex: 1 1 0;
-    padding: 32px;
-    @media (max-width: 1024px) {
-      padding: 24px 20px;
-    }
-  }
-
-  .icon {
-    margin-bottom: 16px;
-    width: 22px;
-    height: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    flex-direction: column;
-    text-align: center;
-  }
+  background-color: var(--color-background);
+  border-bottom: 1px solid var(--color-border);
 }
 
-#docs {
-  border-right: 1px solid var(--border);
+.menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
 
-  @media (max-width: 1024px) {
-    border-right: none;
-    border-bottom: 1px solid var(--border);
-  }
-}
-
-#next-steps ul {
-  list-style: none;
   padding: 0;
+  border: none;
+  background: transparent;
+
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.glass-logo {
+  width: 34px;
+  height: 34px;
+
+  display: block;
+  object-fit: contain;
+
+  flex-shrink: 0;
+}
+
+.brand-name {
+  font-size: 1rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+
+/* =========================
+   Slide-Out Navigation
+========================= */
+
+.side-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+
+  width: min(320px, 85vw);
+  height: 100vh;
+
+  padding: 5rem 2rem 2rem;
+
   display: flex;
-  gap: 8px;
-  margin: 32px 0 0;
+  flex-direction: column;
 
-  .logo {
-    height: 18px;
+  background-color: rgba(33, 29, 26, 0.98);
+
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+
+  z-index: 1001;
+}
+
+.side-nav.open {
+  transform: translateX(0);
+}
+
+.nav-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.5rem;
+
+  padding: 0;
+  border: none;
+  background: transparent;
+
+  color: #f6f1e8;
+
+  font-size: 2rem;
+  font-weight: 300;
+
+  cursor: pointer;
+}
+
+.nav-links,
+.admin-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.nav-links a,
+.admin-nav a,
+.logout-button {
+  width: fit-content;
+
+  padding: 0.25rem 0;
+
+  border: none;
+  background: transparent;
+
+  color: #f6f1e8;
+
+  font-size: 1rem;
+  letter-spacing: 0.06em;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.nav-links a,
+.admin-nav a {
+  border-bottom: 1px solid transparent;
+}
+
+.nav-links a:hover,
+.admin-nav a:hover {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.logout-button:hover {
+  color: var(--color-accent);
+}
+
+.admin-nav {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+
+  border-top: 1px solid rgba(246, 241, 232, 0.18);
+}
+
+
+/* =========================
+   Navigation Overlay
+========================= */
+
+.nav-overlay {
+  position: fixed;
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  padding: 0;
+  border: none;
+
+  background-color: rgba(0, 0, 0, 0.35);
+
+  cursor: pointer;
+
+  z-index: 1000;
+}
+
+
+
+/* =========================
+   Home Page
+========================= */
+
+.home-page {
+  width: 100%;
+}
+
+.home-hero {
+  min-height: 70vh;
+}
+
+.home-brand {
+  padding: 2rem 0 3rem;
+  text-align: center;
+}
+
+.home-logo-placeholder {
+  width: clamp(120px, 18vw, 220px);
+  min-height: 100px;
+
+  margin: 0 auto 1rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--color-border);
+
+  color: var(--color-muted);
+
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-title {
+  margin: 0;
+
+  font-size: clamp(2.25rem, 6vw, 4.5rem);
+
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-hero-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.8fr;
+
+  min-height: 420px;
+
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.home-hero-media,
+.home-hero-content {
+  min-width: 0;
+}
+
+.home-hero-content {
+  border-right: 1px solid var(--color-border);
+}
+
+.home-media-placeholder,
+.home-content-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--color-muted);
+
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.home-content-placeholder {
+  padding: 2rem;
+}
+
+
+/* =========================
+   Home Mobile
+========================= */
+
+@media (max-width: 768px) {
+  .home-brand {
+    padding: 1.5rem 0 2rem;
   }
 
-  a {
-    color: var(--text-h);
-    font-size: 16px;
-    border-radius: 6px;
-    background: var(--social-bg);
-    display: flex;
-    padding: 6px 12px;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.3s;
-
-    &:hover {
-      box-shadow: var(--shadow);
-    }
-    .button-icon {
-      height: 18px;
-      width: 18px;
-    }
+  .home-hero-grid,
+  .signature-pour-grid {
+    grid-template-columns: 1fr;
   }
 
-  @media (max-width: 1024px) {
-    margin-top: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
+  .home-hero-content {
+  border-right: none;
+  border-bottom: 1px solid var(--color-border);
+}
 
-    li {
-      flex: 1 1 calc(50% - 8px);
-    }
+  .home-media-placeholder,
+  .home-content-placeholder {
+    min-height: 300px;
+  }
 
-    a {
-      width: 100%;
-      justify-content: center;
-      box-sizing: border-box;
-    }
+  .signature-pour {
+    padding: 3.5rem 0;
+  }
+
+  .signature-pour-grid {
+    gap: 2rem;
+  }
+
+  .signature-media-placeholder {
+    min-height: 320px;
   }
 }
 
-#spacer {
-  height: 88px;
-  border-top: 1px solid var(--border);
-  @media (max-width: 1024px) {
-    height: 48px;
-  }
+
+
+/* =========================
+   Signature Pour
+========================= */
+
+.signature-pour {
+  padding: 5rem 0;
 }
 
-.ticks {
+.signature-pour-heading {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.signature-pour-heading h2 {
+  margin-bottom: 0;
+
+  font-size: clamp(2rem, 4vw, 3rem);
+
+  letter-spacing: 0.06em;
+}
+
+.signature-carousel {
   position: relative;
+
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.signature-pour-grid {
+  flex: 1;
+
+  display: grid;
+  grid-template-columns: 1.25fr 1fr;
+
+  gap: 4rem;
+
+  align-items: center;
+}
+
+.signature-pour-media,
+.signature-pour-details {
+  min-width: 0;
+}
+
+.signature-media-placeholder {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--color-border);
+
+  color: var(--color-muted);
+
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.signature-pour-details {
+  display: flex;
+  align-items: center;
+}
+
+.signature-cocktail-copy {
+  max-width: 420px;
+}
+
+.signature-cocktail-name {
+  margin-bottom: 1.5rem;
+
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+
+  letter-spacing: 0.04em;
+}
+
+.signature-ingredients {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.signature-ingredients p {
+  margin: 0;
+}
+
+
+/* =========================
+   Signature Pour Controls
+========================= */
+
+.signature-arrow {
+  flex-shrink: 0;
+
+  width: 44px;
+  height: 44px;
+
+  padding: 0;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--color-border);
+  background: transparent;
+
+  color: var(--color-text);
+
+  font-size: 1.25rem;
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.signature-arrow:hover {
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.signature-indicators {
+  margin-top: 2rem;
+
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.signature-indicator {
+  width: 8px;
+  height: 8px;
+
+  padding: 0;
+
+  border: 1px solid var(--color-muted);
+  border-radius: 50%;
+
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.signature-indicator.active {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+
+/* =========================
+   Signature Pour Mobile
+========================= */
+
+@media (max-width: 768px) {
+  .signature-pour {
+    padding: 3.5rem 0;
+  }
+
+  .signature-carousel {
+    gap: 0.75rem;
+  }
+
+  .signature-pour-grid {
+    grid-template-columns: 1fr;
+
+    gap: 2rem;
+  }
+
+  .signature-media-placeholder {
+    aspect-ratio: 4 / 5;
+  }
+
+  .signature-pour-details {
+    justify-content: center;
+  }
+
+  .signature-cocktail-copy {
+    width: 100%;
+    max-width: 500px;
+  }
+
+  .signature-arrow {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+
+
+/* =========================
+   General Page Styling
+========================= */
+
+.main-content > * {
+  width: 100%;
+  max-width: 1200px;
+
+  margin: 0 auto;
+}
+
+h1,
+h2,
+h3 {
+  margin-top: 0;
+  color: var(--color-text);
+  font-weight: 500;
+}
+
+h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+}
+
+h2 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+
+p {
+  color: var(--color-muted);
+  line-height: 1.7;
+}
+
+
+/* =========================
+   Transparent Buttons
+========================= */
+
+button {
+  border-radius: 0;
+}
+
+.main-content button {
+  padding: 0.4rem 0;
+
+  border: none;
+  border-bottom: 1px solid transparent;
+
+  background: transparent;
+
+  color: var(--color-text);
+
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.main-content button:hover {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+
+/* =========================
+   Gallery Page
+========================= */
+
+.gallery-page {
+  width: 100%;
+}
+
+.gallery-header {
+  padding: 2rem 0 3rem;
+  text-align: center;
+}
+
+.gallery-title {
+  margin: 0;
+
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.gallery-status {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.gallery-error {
+  color: var(--color-accent);
+}
+
+
+/* =========================
+   Gallery Admin Panel
+========================= */
+
+.gallery-admin-panel {
+  max-width: 900px;
+  padding: 2.25rem 2.5rem;
+}
+
+.gallery-admin-header {
+  margin-bottom: 2.5rem;
+}
+
+.gallery-admin-header h3 {
+  margin: 0;
+
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gallery-upload-form {
+  gap: 1.25rem 2.5rem;
+}
+
+.gallery-form-group textarea {
+  min-height: 120px;
+}
+
+.gallery-form-group:nth-child(1) {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+.gallery-form-group:nth-child(2) {
+  grid-column: 2;
+  grid-row: 1 / span 2;
+}
+
+.gallery-form-group:nth-child(3) {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
+}
+
+.gallery-form-group label {
+  color: var(--color-muted);
+
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gallery-form-group input,
+.gallery-form-group textarea {
   width: 100%;
 
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    top: -4.5px;
-    border: 5px solid transparent;
-  }
+  padding: 0.75rem 0;
 
-  &::before {
-    left: 0;
-    border-left-color: var(--border);
-  }
-  &::after {
-    right: 0;
-    border-right-color: var(--border);
-  }
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+
+  border-radius: 0;
+
+  background: transparent;
+
+  color: var(--color-text);
+
+  outline: none;
 }
+
+.gallery-form-group textarea {
+  min-height: 160px;
+  resize: vertical;
+}
+
+.gallery-form-group input:focus,
+.gallery-form-group textarea:focus {
+  border-bottom-color: var(--color-accent);
+}
+
+.gallery-upload-button {
+  margin-top: 0;
+}
+
+.gallery-upload-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.gallery-upload-message {
+  margin: 1.5rem 0 0;
+}
+
+
+/* =========================
+   Gallery Grid
+========================= */
 
 .gallery-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
+  grid-template-columns: repeat(2, minmax(0, 1fr));
 
-.gallery-card img {
-  width: 100%;
-  height: 300px;
-  object-fit: cover;
+  gap: 3rem 2rem;
+
+  padding-bottom: 4rem;
 }
 
 .gallery-card {
-  border: 1px solid #ddd;
-  border-radius: 10px;
+  width: 100%;
+  max-width: none;
+
   overflow: hidden;
-  padding: 16px;
+
+  border-bottom: 1px solid var(--color-border);
 }
 
-footer {
-  margin-top: 40px;
-  padding: 20px;
-  text-align: center;
-  border-top: 1px solid #ddd;
+.gallery-card-media {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+
+  overflow: hidden;
+
+  background-color: var(--color-dark);
 }
 
-footer a {
-  display: inline-block;
-  margin-top: 8px;
+.gallery-media {
+  width: 100%;
+  height: 100%;
+
+  display: block;
 }
 
-@media (max-width: 900px) {
+.gallery-image {
+  object-fit: cover;
+}
+
+.gallery-video {
+  object-fit: contain;
+  background-color: var(--color-dark);
+}
+
+.gallery-card-content {
+  padding: 1.5rem 0 2rem;
+}
+
+.gallery-card-title {
+  margin-bottom: 0.75rem;
+
+  font-size: clamp(1.25rem, 2vw, 1.6rem);
+  letter-spacing: 0.04em;
+}
+
+.gallery-card-description {
+  margin-top: 0;
+
+  max-width: 34rem;
+}
+
+
+/* =========================
+   Gallery Admin Card Controls
+========================= */
+
+.gallery-card-admin {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+
+  border-top: 1px solid var(--color-border);
+}
+
+.gallery-visibility {
+  margin: 0 0 1rem;
+
+  font-size: 0.85rem;
+}
+
+.gallery-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+
+/* =========================
+   Gallery Mobile
+========================= */
+
+@media (max-width: 768px) {
+  .gallery-admin-panel {
+    padding: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .gallery-admin-panel {
+    padding: 1.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .gallery-upload-form {
+    grid-template-columns: 1fr;
+  }
+
+  .gallery-form-group:nth-child(1),
+  .gallery-form-group:nth-child(2),
+  .gallery-form-group:nth-child(3) {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
   .gallery-grid {
     grid-template-columns: 1fr;
+
+    gap: 2.5rem;
+  }
+
+  .gallery-card-media {
+    aspect-ratio: 16 / 9;
+  }
+
+  .gallery-upload-button {
+    grid-column: auto;
+    justify-self: start;
+  }
+}
+
+
+/* =========================
+   Services Page
+========================= */
+
+.services-page {
+  width: 100%;
+}
+
+.services-header {
+  padding: 2rem 0 3rem;
+  text-align: center;
+}
+
+.services-title {
+  margin: 0;
+
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.services-status,
+.services-error {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.services-error {
+  color: var(--color-accent);
+}
+
+
+/* =========================
+   Services Grid
+========================= */
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 2rem;
+
+  padding-bottom: 4rem;
+}
+
+.service-card {
+  min-height: 320px;
+
+  display: flex;
+  align-items: stretch;
+
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+
+  transition:
+    border-color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.service-card:hover {
+  border-color: var(--color-accent);
+  transform: translateY(-3px);
+}
+
+.service-card-content {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+
+  padding: 2rem 0;
+}
+
+.service-card-title {
+  margin-bottom: 1rem;
+
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  letter-spacing: 0.04em;
+}
+
+.service-card-description {
+  margin-top: 0;
+  margin-bottom: 2rem;
+
+  max-width: 34rem;
+}
+
+.service-card-price {
+  margin-top: auto;
+  margin-bottom: 1.25rem;
+
+  color: var(--color-text);
+
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+}
+
+.service-card-link {
+  width: fit-content;
+
+  padding-bottom: 0.25rem;
+
+  border-bottom: 1px solid transparent;
+
+  color: var(--color-text);
+
+  letter-spacing: 0.05em;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.service-card-link:hover {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+
+/* =========================
+   Services Mobile
+========================= */
+
+@media (max-width: 768px) {
+  .services-header {
+    padding: 1.5rem 0 2.5rem;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .service-card {
+    min-height: auto;
+  }
+
+  .service-card-content {
+    padding: 1.75rem 0;
+  }
+}
+
+
+/* =========================
+   Service Details Page
+========================= */
+
+.service-details-page {
+  width: 100%;
+}
+
+.service-details-header {
+  padding: 2rem 0 3rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.service-details-eyebrow {
+  margin: 0 0 0.75rem;
+
+  color: var(--color-accent);
+
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.service-details-title {
+  margin: 0;
+
+  font-size: clamp(2.25rem, 5vw, 4rem);
+  letter-spacing: 0.04em;
+}
+
+.service-details-content {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+
+  gap: 4rem;
+
+  padding: 4rem 0;
+}
+
+.service-details-description p {
+  max-width: 44rem;
+
+  margin: 0;
+
+  font-size: 1.05rem;
+  line-height: 1.8;
+}
+
+.service-details-meta {
+  display: flex;
+  flex-direction: column;
+}
+
+.service-details-price {
+  margin: 0 0 3rem;
+
+  color: var(--color-text);
+
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+}
+
+.service-details-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.25rem;
+}
+
+.service-details-link {
+  width: fit-content;
+
+  padding-bottom: 0.25rem;
+
+  border-bottom: 1px solid transparent;
+
+  color: var(--color-text);
+
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.service-details-link:hover {
+  color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
+}
+
+.service-details-quote-link {
+  color: var(--color-accent);
+}
+
+
+/* =========================
+   Service Details Mobile
+========================= */
+
+@media (max-width: 768px) {
+  .service-details-header {
+    padding: 1.5rem 0 2.5rem;
+  }
+
+  .service-details-content {
+    grid-template-columns: 1fr;
+
+    gap: 2.5rem;
+
+    padding: 3rem 0;
+  }
+
+  .service-details-price {
+    margin-bottom: 2rem;
+  }
+
+  .service-details-actions {
+    gap: 1rem;
+  }
+
+  .service-details-link {
+    font-size: 0.9rem;
+  }
+}
+
+
+
+/* =========================
+   About Page
+========================= */
+
+.about-page {
+  width: 100%;
+}
+
+
+/* =========================
+   About Introduction
+========================= */
+
+.about-intro {
+  max-width: 900px;
+
+  margin: 0 auto;
+
+  padding: 5rem 0 6rem;
+
+  text-align: center;
+}
+
+.about-logo-placeholder {
+  width: clamp(120px, 18vw, 220px);
+  min-height: 120px;
+
+  margin: 0 auto 2.5rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--color-border);
+
+  color: var(--color-muted);
+
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.about-statement {
+  margin: 0;
+
+  font-size: clamp(2.5rem, 6vw, 4.75rem);
+  line-height: 1.1;
+
+  letter-spacing: 0.02em;
+}
+
+
+/* =========================
+   About Story
+========================= */
+
+.about-story {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+
+  min-height: 520px;
+
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.about-story-media {
+  min-width: 0;
+
+  border-right: 1px solid var(--color-border);
+}
+
+.about-image-placeholder {
+  width: 100%;
+  height: 100%;
+  min-height: 520px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--color-muted);
+
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.about-story-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  padding: 4rem;
+}
+
+.about-section-label {
+  margin: 0 0 1.5rem;
+
+  color: var(--color-accent);
+
+  font-size: 0.8rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.about-story-copy {
+  max-width: 32rem;
+}
+
+.about-story-copy p {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
+
+  line-height: 1.8;
+}
+
+
+/* =========================
+   About Values
+========================= */
+
+.about-values {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+
+  padding: 5rem 0;
+}
+
+.about-value {
+  padding: 1rem 3rem;
+
+  text-align: center;
+}
+
+.about-value + .about-value {
+  border-left: 1px solid var(--color-border);
+}
+
+.about-value h3 {
+  margin-bottom: 1rem;
+
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.about-value p {
+  max-width: 16rem;
+
+  margin: 0 auto;
+}
+
+
+/* =========================
+   About CTA
+========================= */
+
+.about-cta {
+  padding: 5rem 0 6rem;
+
+  border-top: 1px solid var(--color-border);
+
+  text-align: center;
+}
+
+.about-cta p {
+  margin: 0 0 1.25rem;
+
+  font-size: clamp(1.5rem, 3vw, 2.25rem);
+
+  color: var(--color-text);
+}
+
+.about-cta-link {
+  display: inline-block;
+
+  padding-bottom: 0.25rem;
+
+  border-bottom: 1px solid transparent;
+
+  color: var(--color-accent);
+
+  letter-spacing: 0.05em;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.about-cta-link:hover {
+  border-bottom-color: var(--color-accent);
+}
+
+
+/* =========================
+   About Mobile
+========================= */
+
+@media (max-width: 768px) {
+  .about-intro {
+    padding: 3.5rem 0 4rem;
+  }
+
+  .about-story {
+    grid-template-columns: 1fr;
+  }
+
+  .about-story-media {
+    border-right: none;
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .about-image-placeholder {
+    min-height: 360px;
+  }
+
+  .about-story-content {
+    padding: 3rem 1rem;
+  }
+
+  .about-values {
+    grid-template-columns: 1fr;
+
+    padding: 3rem 0;
+  }
+
+  .about-value {
+    padding: 2rem 1rem;
+  }
+
+  .about-value + .about-value {
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .about-cta {
+    padding: 4rem 0;
+  }
+}
+
+
+/* =========================
+   Request Quote Page
+========================= */
+
+.quote-page {
+  width: 100%;
+}
+
+.quote-header {
+  max-width: 800px;
+
+  margin: 0 auto;
+
+  padding: 3rem 0 4rem;
+
+  text-align: center;
+}
+
+.quote-eyebrow {
+  margin: 0 0 1rem;
+
+  color: var(--color-accent);
+
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.quote-title {
+  margin: 0;
+
+  font-size: clamp(2.25rem, 5vw, 4rem);
+
+  line-height: 1.1;
+  letter-spacing: 0.03em;
+}
+
+
+/* =========================
+   Quote Form
+========================= */
+
+.quote-form {
+  max-width: 950px;
+
+  margin: 0 auto;
+
+  padding-bottom: 5rem;
+}
+
+.quote-form-section {
+  padding: 3rem 0;
+
+  border-top: 1px solid var(--color-border);
+}
+
+.quote-section-heading {
+  margin-bottom: 2.5rem;
+}
+
+.quote-section-heading h3 {
+  margin: 0;
+
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.quote-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 2.5rem 3rem;
+}
+
+.quote-field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.6rem;
+}
+
+.quote-field label {
+  color: var(--color-muted);
+
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+
+/* =========================
+   Inputs
+========================= */
+
+.quote-field input,
+.quote-field select,
+.quote-field textarea {
+  width: 100%;
+
+  padding: 0.75rem 0;
+
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+
+  border-radius: 0;
+
+  background: transparent;
+
+  color: var(--color-text);
+
+  outline: none;
+
+  transition: border-color 0.2s ease;
+}
+
+.quote-field input:focus,
+.quote-field select:focus,
+.quote-field textarea:focus {
+  border-bottom-color: var(--color-accent);
+}
+
+.quote-field input::placeholder,
+.quote-field textarea::placeholder {
+  color: var(--color-muted);
+
+  opacity: 0.65;
+}
+
+.quote-field select {
+  cursor: pointer;
+}
+
+.quote-message-field textarea {
+  min-height: 150px;
+
+  resize: vertical;
+}
+
+
+/* =========================
+   Form Messages
+========================= */
+
+.quote-field-message {
+  margin: 0.25rem 0 0;
+
+  font-size: 0.8rem;
+}
+
+.quote-availability {
+  min-height: 2rem;
+
+  margin-top: 2rem;
+}
+
+.quote-availability p {
+  margin: 0;
+
+  font-size: 0.9rem;
+}
+
+.quote-available {
+  color: var(--color-accent);
+}
+
+.quote-unavailable,
+.quote-error,
+.quote-page-error {
+  color: #8b4a3d;
+}
+
+.quote-page-error {
+  margin: -3rem auto 3rem;
+
+  max-width: 950px;
+
+  text-align: center;
+}
+
+
+/* =========================
+   Submit
+========================= */
+
+.quote-form-footer {
+  display: flex;
+  justify-content: flex-end;
+
+  padding-top: 2rem;
+
+  border-top: 1px solid var(--color-border);
+}
+
+.quote-submit-button {
+  font-size: 1rem;
+
+  letter-spacing: 0.06em;
+}
+
+.quote-submit-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+
+/* =========================
+   Request Quote Mobile
+========================= */
+
+@media (max-width: 768px) {
+  .quote-header {
+    padding: 2rem 0 3rem;
+  }
+
+  .quote-form-grid {
+    grid-template-columns: 1fr;
+
+    gap: 2rem;
+  }
+
+  .quote-form-section {
+    padding: 2.5rem 0;
+  }
+
+  .quote-form-footer {
+    justify-content: flex-start;
+  }
+}
+
+
+/* =========================
+   Confirmation Page
+========================= */
+
+.confirmation-page {
+  width: 100%;
+
+  display: flex;
+  justify-content: center;
+}
+
+.confirmation-content,
+.confirmation-empty {
+  width: 100%;
+  max-width: 750px;
+
+  padding: 5rem 0 6rem;
+
+  text-align: center;
+}
+
+.confirmation-eyebrow {
+  margin: 0 0 1.5rem;
+
+  color: var(--color-accent);
+
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.confirmation-title {
+  margin: 0;
+
+  font-size: clamp(1.75rem, 3.5vw, 2.75rem);
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  font-weight: 500;
+}
+
+.confirmation-logo-placeholder {
+  width: clamp(110px, 16vw, 180px);
+  min-height: 100px;
+
+  margin: 0 auto 2.5rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid var(--color-border);
+
+  color: var(--color-muted);
+
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+
+/* =========================
+   Confirmation Number
+========================= */
+
+.confirmation-number-section {
+  margin: 4rem 0 3rem;
+
+  padding: 3rem 1rem;
+
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.confirmation-number-label {
+  margin: 0 0 1rem;
+
+  color: var(--color-muted);
+
+  font-size: 0.75rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.confirmation-number {
+  margin: 0;
+
+  color: var(--color-text);
+
+  font-size: clamp(1.35rem, 2.5vw, 2rem);
+  font-weight: 500;
+
+  letter-spacing: 0.08em;
+}
+
+
+/* =========================
+   Confirmation Email
+========================= */
+
+.confirmation-email {
+  margin-bottom: 3rem;
+}
+
+.confirmation-email p {
+  margin: 0.25rem 0;
+}
+
+.confirmation-email-address {
+  color: var(--color-text);
+
+  font-weight: 500;
+}
+
+
+/* =========================
+   Confirmation Link
+========================= */
+
+.confirmation-link {
+  display: inline-block;
+
+  padding-bottom: 0.25rem;
+
+  border-bottom: 1px solid transparent;
+
+  color: var(--color-accent);
+
+  letter-spacing: 0.05em;
+
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.confirmation-link:hover {
+  border-bottom-color: var(--color-accent);
+}
+
+
+/* =========================
+   Empty Confirmation
+========================= */
+
+.confirmation-message {
+  margin: 2rem 0;
+}
+
+
+/* =========================
+   Confirmation Mobile
+========================= */
+
+@media (max-width: 768px) {
+  .confirmation-content,
+  .confirmation-empty {
+    padding: 3.5rem 0 4rem;
+  }
+
+  .confirmation-number-section {
+    margin: 3rem 0 2.5rem;
+
+    padding: 2.5rem 0.5rem;
+  }
+}
+
+
+
+/* =========================
+   Admin Dashboard
+========================= */
+
+.admin-dashboard-page {
+  width: 100%;
+}
+
+.admin-dashboard-header {
+  padding: 2rem 0 3rem;
+}
+
+.admin-eyebrow {
+  margin: 0 0 0.75rem;
+
+  color: var(--color-accent);
+
+  font-size: 0.8rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.admin-dashboard-title {
+  margin: 0;
+
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  letter-spacing: 0.04em;
+}
+
+
+/* =========================
+   Admin Overview
+========================= */
+
+.admin-overview {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+
+  margin-bottom: 4rem;
+}
+
+.admin-overview-item {
+  padding: 1.75rem 1rem;
+
+  text-align: center;
+}
+
+.admin-overview-item + .admin-overview-item {
+  border-left: 1px solid var(--color-border);
+}
+
+.admin-overview-item span {
+  display: block;
+
+  margin-bottom: 0.75rem;
+
+  color: var(--color-muted);
+
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-overview-item strong {
+  font-size: 1.5rem;
+  font-weight: 500;
+}
+
+
+/* =========================
+   Booking Filters
+========================= */
+
+.admin-bookings-section {
+  padding-bottom: 4rem;
+}
+
+.admin-section-header {
+  margin-bottom: 2rem;
+}
+
+.admin-section-header h3 {
+  margin: 0;
+
+  font-size: 1rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.admin-filters {
+  display: grid;
+  grid-template-columns: 2fr repeat(3, 1fr);
+
+  gap: 1.5rem;
+
+  margin-bottom: 3rem;
+}
+
+.admin-filters input,
+.admin-filters select {
+  width: 100%;
+
+  padding: 0.75rem 0;
+
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+
+  border-radius: 0;
+
+  background: transparent;
+
+  color: var(--color-text);
+
+  outline: none;
+}
+
+.admin-filters input:focus,
+.admin-filters select:focus {
+  border-bottom-color: var(--color-accent);
+}
+
+
+/* =========================
+   Booking List
+========================= */
+
+.admin-booking-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-booking-item {
+  padding: 2rem 0;
+
+  border-top: 1px solid var(--color-border);
+}
+
+.admin-booking-item:last-child {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.admin-booking-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  gap: 2rem;
+
+  margin-bottom: 2rem;
+}
+
+.admin-booking-heading h4 {
+  margin: 0 0 0.5rem;
+
+  font-size: 1.35rem;
+  font-weight: 500;
+}
+
+.admin-booking-heading p {
+  margin: 0;
+
+  font-size: 0.85rem;
+}
+
+.admin-booking-link {
+  flex-shrink: 0;
+
+  padding-bottom: 0.25rem;
+
+  border-bottom: 1px solid transparent;
+
+  color: var(--color-accent);
+
+  letter-spacing: 0.04em;
+}
+
+.admin-booking-link:hover {
+  border-bottom-color: var(--color-accent);
+}
+
+.admin-booking-details {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 1.5rem 2rem;
+}
+
+.admin-booking-details p {
+  margin: 0;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.35rem;
+
+  color: var(--color-text);
+}
+
+.admin-booking-details span {
+  color: var(--color-muted);
+
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-status-message {
+  margin: 2rem 0;
+}
+
+.admin-error {
+  color: #8b4a3d;
+}
+
+
+/* =========================
+   Admin Dashboard Mobile
+========================= */
+
+@media (max-width: 768px) {
+  .admin-dashboard-header {
+    padding: 1.5rem 0 2.5rem;
+  }
+
+  .admin-overview {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .admin-overview-item:nth-child(odd) {
+    border-left: none;
+  }
+
+  .admin-overview-item:nth-child(n + 3) {
+    border-top: 1px solid var(--color-border);
+  }
+
+  .admin-filters {
+    grid-template-columns: 1fr;
+
+    gap: 1.5rem;
+  }
+
+  .admin-booking-heading {
+    flex-direction: column;
+
+    gap: 1rem;
+  }
+
+  .admin-booking-details {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 1.5rem;
+  }
+}
+
+
+
+/* =========================
+   Admin Booking Details
+========================= */
+
+.admin-booking-page {
+  width: 100%;
+}
+
+.admin-booking-header {
+  padding: 2rem 0 3rem;
+
+  border-bottom: 1px solid var(--color-border);
+}
+
+.admin-booking-title {
+  margin: 0 0 0.75rem;
+
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  letter-spacing: 0.03em;
+}
+
+.admin-booking-confirmation {
+  margin: 0;
+}
+
+
+/* =========================
+   Booking Information
+========================= */
+
+.admin-booking-info {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+
+  gap: 2.5rem 3rem;
+
+  padding: 3rem 0;
+}
+
+.admin-booking-info-item {
+  min-width: 0;
+}
+
+.admin-booking-info-item span {
+  display: block;
+
+  margin-bottom: 0.5rem;
+
+  color: var(--color-muted);
+
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-booking-info-item p {
+  margin: 0;
+
+  color: var(--color-text);
+
+  line-height: 1.6;
+
+  overflow-wrap: anywhere;
+}
+
+.admin-booking-message {
+  grid-column: span 4;
+  max-width: 700px;
+}
+
+
+/* =========================
+   Admin Booking Actions
+========================= */
+
+.admin-booking-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  gap: 3rem;
+
+  padding: 3rem 0;
+
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.admin-action-section {
+  display: flex;
+  flex-direction: column;
+
+  align-items: flex-start;
+}
+
+.admin-action-section + .admin-action-section {
+  padding-left: 3rem;
+
+  border-left: 1px solid var(--color-border);
+}
+
+.admin-action-section h3 {
+  margin: 0 0 1.5rem;
+
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-status-select,
+.admin-notes-textarea {
+  width: 100%;
+
+  padding: 0.75rem 0;
+
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+
+  border-radius: 0;
+
+  background: transparent;
+
+  color: var(--color-text);
+
+  outline: none;
+}
+
+.admin-status-select:focus,
+.admin-notes-textarea:focus {
+  border-bottom-color: var(--color-accent);
+}
+
+.admin-notes-textarea {
+  min-height: 140px;
+
+  margin-bottom: 1.25rem;
+
+  resize: vertical;
+}
+
+.admin-email-status {
+  margin-top: 0;
+}
+
+.admin-action-button {
+  width: fit-content;
+}
+
+.admin-action-message {
+  margin: 1rem 0 0;
+
+  font-size: 0.85rem;
+}
+
+
+/* =========================
+   Admin Booking Footer
+========================= */
+
+.admin-booking-footer {
+  padding: 3rem 0;
+}
+
+.admin-return-link {
+  display: inline-block;
+
+  padding-bottom: 0.25rem;
+
+  border-bottom: 1px solid transparent;
+
+  color: var(--color-accent);
+
+  letter-spacing: 0.04em;
+}
+
+.admin-return-link:hover {
+  border-bottom-color: var(--color-accent);
+}
+
+
+/* =========================
+   Admin Booking Mobile
+========================= */
+
+@media (max-width: 768px) {
+  .admin-booking-header {
+    padding: 1.5rem 0 2.5rem;
+  }
+
+  .admin-booking-info {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+
+    gap: 2rem 1.5rem;
+  }
+
+  .admin-booking-message {
+    grid-column: span 2;
+  }
+
+  .admin-booking-actions {
+    grid-template-columns: 1fr;
+
+    gap: 0;
+
+    padding: 0;
+  }
+
+  .admin-action-section {
+    padding: 2.5rem 0;
+  }
+
+  .admin-action-section + .admin-action-section {
+    padding-left: 0;
+
+    border-left: none;
+    border-top: 1px solid var(--color-border);
+  }
+
+  .admin-booking-footer {
+    padding: 2.5rem 0;
+  }
+}
+
+
+
+/* =========================
+   Admin Calendar
+========================= */
+
+.admin-calendar-page {
+  width: 100%;
+}
+
+.admin-calendar-header {
+  padding: 2rem 0 3rem;
+}
+
+.admin-calendar-title {
+  margin: 0 0 1rem;
+
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  letter-spacing: 0.04em;
+}
+
+.admin-calendar-description {
+  max-width: 620px;
+
+  margin: 0;
+}
+
+
+/* =========================
+   Calendar Container
+========================= */
+
+.admin-calendar-container {
+  padding: 2rem 0 4rem;
+
+  border-top: 1px solid var(--color-border);
+}
+
+
+/* =========================
+   FullCalendar Styling
+========================= */
+
+.admin-calendar-container .fc {
+  color: var(--color-text);
+
+  font-family: inherit;
+}
+
+.admin-calendar-container .fc-theme-standard td,
+.admin-calendar-container .fc-theme-standard th {
+  border-color: var(--color-border);
+}
+
+.admin-calendar-container .fc-theme-standard .fc-scrollgrid {
+  border-color: var(--color-border);
+}
+
+.admin-calendar-container .fc .fc-toolbar-title {
+  color: var(--color-text);
+
+  font-size: clamp(1.25rem, 2vw, 1.75rem);
+  font-weight: 500;
+
+  letter-spacing: 0.04em;
+}
+
+.admin-calendar-container .fc .fc-col-header-cell-cushion {
+  padding: 0.75rem 0.25rem;
+
+  color: var(--color-muted);
+
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-calendar-container .fc .fc-daygrid-day-number {
+  padding: 0.5rem;
+
+  color: var(--color-text);
+}
+
+.admin-calendar-container .fc .fc-button {
+  border: none;
+
+  background: transparent;
+
+  color: var(--color-text);
+
+  box-shadow: none;
+
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+
+  text-transform: none;
+}
+
+.admin-calendar-container .fc .fc-button:hover {
+  background: transparent;
+
+  color: var(--color-accent);
+}
+
+.admin-calendar-container .fc .fc-button-primary:not(:disabled).fc-button-active,
+.admin-calendar-container .fc .fc-button-primary:not(:disabled):active {
+  background: transparent;
+
+  color: var(--color-accent);
+
+  box-shadow: none;
+}
+
+.admin-calendar-container .fc .fc-button:disabled {
+  background: transparent;
+
+  color: var(--color-muted);
+
+  opacity: 0.5;
+}
+
+.admin-calendar-container .fc .fc-day-today {
+  background-color: rgba(164, 124, 72, 0.08);
+}
+
+
+/* =========================
+   Calendar Events
+========================= */
+
+.admin-calendar-container .fc-event {
+  border: none;
+
+  border-radius: 0;
+
+  padding: 0.15rem 0.25rem;
+
+  font-size: 0.75rem;
+}
+
+.admin-calendar-container .fc-daygrid-event {
+  white-space: normal;
+}
+
+
+/* =========================
+   Admin Calendar Mobile
+========================= */
+
+@media (max-width: 768px) {
+  .admin-calendar-header {
+    padding: 1.5rem 0 2.5rem;
+  }
+
+  .admin-calendar-container {
+    padding: 1.5rem 0 3rem;
+  }
+
+  .admin-calendar-container .fc .fc-toolbar {
+    flex-direction: column;
+
+    gap: 1rem;
+  }
+
+  .admin-calendar-container .fc .fc-toolbar-chunk {
+    display: flex;
+    justify-content: center;
+  }
+
+  .admin-calendar-container .fc .fc-button {
+    font-size: 0.75rem;
+  }
+
+  .admin-calendar-container .fc .fc-col-header-cell-cushion {
+    font-size: 0.65rem;
+    letter-spacing: 0.04em;
+  }
+
+  .admin-calendar-container .fc .fc-daygrid-day-number {
+    padding: 0.35rem;
+  }
+
+  .admin-calendar-container .fc-event {
+    font-size: 0.65rem;
+  }
+}
+
+
+/* =========================
+   Add Admin
+========================= */
+
+.add-admin-page {
+  width: 100%;
+}
+
+.add-admin-header {
+  max-width: 700px;
+
+  margin: 0 auto;
+
+  padding: 2rem 0 3rem;
+
+  text-align: center;
+}
+
+.add-admin-title {
+  margin: 0 0 1rem;
+
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  letter-spacing: 0.04em;
+}
+
+.add-admin-description {
+  margin: 0;
+}
+
+.add-admin-panel {
+  width: 100%;
+  max-width: 700px;
+
+  margin: 0 auto 5rem;
+  padding: 2.5rem 3rem;
+
+  border: 1px solid var(--color-border);
+}
+
+.add-admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.add-admin-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.add-admin-field label {
+  color: var(--color-muted);
+
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.add-admin-field input {
+  width: 100%;
+
+  padding: 0.75rem 0;
+
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+
+  border-radius: 0;
+
+  background: transparent;
+
+  color: var(--color-text);
+
+  outline: none;
+}
+
+.add-admin-field input:focus {
+  border-bottom-color: var(--color-accent);
+}
+
+.add-admin-form-footer {
+  display: flex;
+  justify-content: flex-end;
+
+  padding-top: 0.5rem;
+}
+
+.add-admin-button {
+  width: fit-content;
+}
+
+.add-admin-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.add-admin-message {
+  margin: 1.5rem 0 0;
+
+  text-align: center;
+}
+
+.add-admin-error {
+  color: #8b4a3d;
+}
+
+
+/* =========================
+   Add Admin Mobile
+========================= */
+
+@media (max-width: 768px) {
+  .add-admin-header {
+    padding: 1.5rem 0 2.5rem;
+  }
+
+  .add-admin-panel {
+    padding: 1.5rem;
+    margin-bottom: 4rem;
+  }
+
+  .add-admin-form-footer {
+    justify-content: flex-start;
+  }
+}
+
+
+/* =========================
+   Admin Login
+========================= */
+
+.admin-login-page {
+  width: 100%;
+}
+
+.admin-login-header {
+  max-width: 700px;
+
+  margin: 0 auto;
+
+  padding: 3rem 0 3rem;
+
+  text-align: center;
+}
+
+.admin-login-title {
+  margin: 0 0 1rem;
+
+  font-size: clamp(2.25rem, 5vw, 3.75rem);
+  letter-spacing: 0.04em;
+}
+
+.admin-login-description {
+  max-width: 500px;
+
+  margin: 0 auto;
+}
+
+.admin-login-panel {
+  width: 100%;
+  max-width: 560px;
+
+  margin: 0 auto 5rem;
+  padding: 2.5rem 3rem;
+
+  border: 1px solid var(--color-border);
+}
+
+.admin-login-form {
+  display: flex;
+  flex-direction: column;
+
+  gap: 2rem;
+}
+
+.admin-login-field {
+  display: flex;
+  flex-direction: column;
+
+  gap: 0.6rem;
+}
+
+.admin-login-field label {
+  color: var(--color-muted);
+
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-login-field input {
+  width: 100%;
+
+  padding: 0.75rem 0;
+
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+
+  border-radius: 0;
+
+  background: transparent;
+
+  color: var(--color-text);
+
+  outline: none;
+}
+
+.admin-login-field input:focus {
+  border-bottom-color: var(--color-accent);
+}
+
+.admin-login-form-footer {
+  display: flex;
+  justify-content: flex-end;
+
+  padding-top: 0.5rem;
+}
+
+.admin-login-button {
+  width: fit-content;
+}
+
+.admin-login-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.admin-login-error {
+  margin: 1.5rem 0 0;
+
+  color: #8b4a3d;
+
+  text-align: center;
+}
+
+
+/* =========================
+   Admin Login Mobile
+========================= */
+
+@media (max-width: 768px) {
+  .admin-login-header {
+    padding: 2rem 0 2.5rem;
+  }
+
+  .admin-login-panel {
+    padding: 1.5rem;
+    margin-bottom: 4rem;
+  }
+
+  .admin-login-form-footer {
+    justify-content: flex-start;
+  }
+}
+
+
+/* =========================
+   Footer
+========================= */
+
+.site-footer {
+  width: 100%;
+
+  padding: 1.5rem;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+
+  border-top: 1px solid var(--color-border);
+
+  background-color: var(--color-background);
+}
+
+.site-footer p {
+  margin: 0;
+
+  font-size: 0.85rem;
+  letter-spacing: 0.04em;
+}
+
+.admin-link {
+  font-size: 0.8rem;
+  color: var(--color-muted);
+
+  transition: color 0.2s ease;
+}
+
+.admin-link:hover {
+  color: var(--color-accent);
+}
+
+
+/* =========================
+   Mobile
+========================= */
+
+@media (max-width: 600px) {
+  .site-header {
+    padding: 1rem;
+  }
+
+  @media (min-width: 769px) {
+  .glass-logo {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+  .brand-name {
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+  }
+
+  .main-content {
+    padding: 1.5rem 1rem 2.5rem;
+  }
+
+  .site-footer {
+    padding: 1.25rem 1rem;
+
+    flex-direction: column;
+    align-items: flex-start;
   }
 }

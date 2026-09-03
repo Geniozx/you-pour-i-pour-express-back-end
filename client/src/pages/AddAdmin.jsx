@@ -33,7 +33,7 @@ function AddAdmin() {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/admins",
+        "/api/admins",
         {
           method: "POST",
           headers: {
@@ -41,7 +41,7 @@ function AddAdmin() {
             Authorization: `Bearer ${token}`
           },
           body: JSON.stringify({
-            username,
+            username: username.trim(),
             password
           })
         }
@@ -76,50 +76,102 @@ function AddAdmin() {
   }
 
   return (
-    <div>
-      <h2>Add Admin</h2>
+    <div className="add-admin-page">
+      <section className="add-admin-header">
+        <p className="admin-eyebrow">
+          Administration
+        </p>
 
-      <form onSubmit={handleSubmit}>
-        <label>Username: </label>
-        <input
-          type="text"
-          value={username}
-          onChange={(event) => {
-            setUsername(event.target.value);
-          }}
-          required
-        />
+        <h2 className="add-admin-title">
+          Add Admin
+        </h2>
 
-        <label>Password: </label>
-        <input
-          type="password"
-          value={password}
-          onChange={(event) => {
-            setPassword(event.target.value);
-          }}
-          required
-        />
+        <p className="add-admin-description">
+          Create a new administrator account.
+        </p>
+      </section>
 
-        <label>Confirm Password: </label>
-        <input
-          type="password"
-          value={confirmPassword}
-          onChange={(event) => {
-            setConfirmPassword(event.target.value);
-          }}
-          required
-        />
-
-        <button
-          type="submit"
-          disabled={submitting}
+      <section className="add-admin-panel">
+        <form
+          className="add-admin-form"
+          onSubmit={handleSubmit}
         >
-          {submitting ? "Creating..." : "Create Admin"}
-        </button>
-      </form>
+          <div className="add-admin-field">
+            <label htmlFor="add-admin-username">
+              Username
+            </label>
 
-      {error && <p>{error}</p>}
-      {message && <p>{message}</p>}
+            <input
+              id="add-admin-username"
+              type="text"
+              value={username}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck="false"
+              onChange={(event) => {
+                setUsername(event.target.value);
+              }}
+              required
+            />
+          </div>
+
+          <div className="add-admin-field">
+            <label htmlFor="add-admin-password">
+              Password
+            </label>
+
+            <input
+              id="add-admin-password"
+              type="password"
+              value={password}
+              onChange={(event) => {
+                setPassword(event.target.value);
+              }}
+              required
+            />
+          </div>
+
+          <div className="add-admin-field">
+            <label htmlFor="add-admin-confirm-password">
+              Confirm Password
+            </label>
+
+            <input
+              id="add-admin-confirm-password"
+              type="password"
+              value={confirmPassword}
+              onChange={(event) => {
+                setConfirmPassword(event.target.value);
+              }}
+              required
+            />
+          </div>
+
+          <div className="add-admin-form-footer">
+            <button
+              className="add-admin-button"
+              type="submit"
+              disabled={submitting}
+            >
+              {submitting
+                ? "Creating..."
+                : "Create Admin →"}
+            </button>
+          </div>
+        </form>
+
+        {error && (
+          <p className="add-admin-message add-admin-error">
+            {error}
+          </p>
+        )}
+
+        {message && (
+          <p className="add-admin-message">
+            {message}
+          </p>
+        )}
+      </section>
     </div>
   );
 }

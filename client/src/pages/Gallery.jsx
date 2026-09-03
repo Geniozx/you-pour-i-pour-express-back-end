@@ -18,8 +18,8 @@ function Gallery() {
         const token = localStorage.getItem("token");
 
         const url = token
-          ? "http://localhost:3000/api/gallery/admin/all"
-          : "http://localhost:3000/api/gallery";
+          ? "/api/gallery/admin/all"
+          : "/api/gallery";
 
         const response = await fetch(url, {
           headers: token
@@ -71,7 +71,7 @@ function Gallery() {
 
     try {
       const response = await fetch(
-        "http://localhost:3000/api/gallery",
+        "/api/gallery",
         {
           method: "POST",
           headers: {
@@ -116,7 +116,7 @@ function Gallery() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/gallery/${itemId}`,
+        `/api/gallery/${itemId}`,
         {
           method: "PATCH",
           headers: {
@@ -165,7 +165,7 @@ function Gallery() {
 
     try {
       const response = await fetch(
-        `http://localhost:3000/api/gallery/${itemId}`,
+        `/gallery/${itemId}`,
         {
           method: "DELETE",
           headers: {
@@ -203,43 +203,69 @@ function Gallery() {
 
 
   return (
-    <div>
-      <h2>Gallery</h2>
+    <div className="gallery-page">
+      <section className="gallery-header">
+        <h2 className="gallery-title">Gallery</h2>
+      </section>
 
       {isAdminLoggedIn && (
-        <div>
-          <h3>Admin Gallery Controls</h3>
+        <section className="gallery-admin-panel">
+          <div className="gallery-admin-header">
+            <h3>Admin Gallery Controls</h3>
+          </div>
 
-          <form onSubmit={handleUpload}>
-            <label>Title: </label>
-            <input
-              type="text"
-              value={title}
-              onChange={(event) => {
-                setTitle(event.target.value);
-              }}
-              required
-            />
+          <form
+            className="gallery-upload-form"
+            onSubmit={handleUpload}
+          >
+            <div className="gallery-form-group">
+              <label htmlFor="gallery-title-input">
+                Title
+              </label>
 
-            <label>Description: </label>
-            <textarea
-              value={description}
-              onChange={(event) => {
-                setDescription(event.target.value);
-              }}
-            />
+              <input
+                id="gallery-title-input"
+                type="text"
+                value={title}
+                onChange={(event) => {
+                  setTitle(event.target.value);
+                }}
+                required
+              />
+            </div>
 
-            <label>Image or Video: </label>
-            <input
-              type="file"
-              accept="image/*,video/*"
-              onChange={(event) => {
-                setMedia(event.target.files[0]);
-              }}
-              required
-            />
+            <div className="gallery-form-group">
+              <label htmlFor="gallery-description-input">
+                Description
+              </label>
+
+              <textarea
+                id="gallery-description-input"
+                value={description}
+                onChange={(event) => {
+                  setDescription(event.target.value);
+                }}
+              />
+            </div>
+
+            <div className="gallery-form-group">
+              <label htmlFor="gallery-media-input">
+                Image or Video
+              </label>
+
+              <input
+                id="gallery-media-input"
+                type="file"
+                accept="image/*,video/*"
+                onChange={(event) => {
+                  setMedia(event.target.files[0]);
+                }}
+                required
+              />
+            </div>
 
             <button
+              className="gallery-upload-button"
               type="submit"
               disabled={uploading}
             >
@@ -247,68 +273,95 @@ function Gallery() {
             </button>
           </form>
 
-          {uploadMessage && <p>{uploadMessage}</p>}
-        </div>
+          {uploadMessage && (
+            <p className="gallery-upload-message">
+              {uploadMessage}
+            </p>
+          )}
+        </section>
       )}
 
-      {error && <p>{error}</p>}
+      {error && (
+        <p className="gallery-status gallery-error">
+          {error}
+        </p>
+      )}
 
       {galleryItems.length === 0 && !error && (
-        <p>No gallery items available.</p>
+        <p className="gallery-status">
+          No gallery items available.
+        </p>
       )}
 
-      <div className="gallery-grid">
+      <section className="gallery-grid">
         {galleryItems.map((item) => (
-          <div
+          <article
             key={item.id}
             className="gallery-card"
           >
-            <h3>{item.title}</h3>
-
-            {item.media_type === "video" ? (
-              <video controls>
-                <source
+            <div className="gallery-card-media">
+              {item.media_type === "video" ? (
+                <video
+                  className="gallery-media gallery-video"
+                  controls
+                  controlsList="nodownload noplaybackrate"
+                  disablePictureInPicture
+                  preload="metadata"
+                >
+                  <source
+                    src={item.media_url}
+                    type="video/mp4"
+                  />
+                  Your browser does not support video.
+                </video>
+              ) : (
+                <img
+                  className="gallery-media gallery-image"
                   src={item.media_url}
-                  type="video/mp4"
+                  alt={item.title}
                 />
-                Your browser does not support video.
-              </video>
-            ) : (
-              <img
-                src={item.media_url}
-                alt={item.title}
-              />
-            )}
+              )}
+            </div>
 
-            {item.description && (
-              <p>{item.description}</p>
-            )}
+            <div className="gallery-card-content">
+              <h3 className="gallery-card-title">
+                {item.title}
+              </h3>
 
-            <br />
-            {isAdminLoggedIn && (
-              <div>
-                <p>
-                  Visibility: {item.is_active ? "Visible" : "Hidden"}
+              {item.description && (
+                <p className="gallery-card-description">
+                  {item.description}
                 </p>
+              )}
 
-                <button
-                  type="button"
-                  onClick={() => handleToggle(item.id)}
-                >
-                  {item.is_active ? "Hide" : "Show"}
-                </button>
+              {isAdminLoggedIn && (
+                <div className="gallery-card-admin">
+                  <p className="gallery-visibility">
+                    Visibility:{" "}
+                    {item.is_active ? "Visible" : "Hidden"}
+                  </p>
 
-                <button
-                  type="button"
-                  onClick={() => handleDelete(item.id)}
-                >
-                  Delete
-                </button>
-              </div>
-            )}
-          </div>
+                  <div className="gallery-card-actions">
+                    <button
+                      type="button"
+                      onClick={() => handleToggle(item.id)}
+                    >
+                      {item.is_active ? "Hide" : "Show"}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(item.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </article>
         ))}
-      </div>
+      </section>
     </div>
   );
 }

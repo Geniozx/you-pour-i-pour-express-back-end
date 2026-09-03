@@ -13,7 +13,7 @@ function ServiceDetails() {
     async function fetchService() {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/services/${id}`
+          `/api/services/${id}`
         );
 
         if (!response.ok) {
@@ -41,22 +41,46 @@ function ServiceDetails() {
   }
 
   return (
-  <div>
-    <h2>Service Details</h2>
+    <div className="service-details-page">
+      <section className="service-details-header">
+        <p className="service-details-eyebrow">
+          Service Details
+        </p>
 
-    <h3>{service.name}</h3>
-    <p>{service.description}</p>
-    <p>${service.price}</p>
+        <h2 className="service-details-title">
+          {service.name}
+        </h2>
+      </section>
 
-    <Link to={"/services"}>
-      Back to Services
-    </Link>
+      <section className="service-details-content">
+        <div className="service-details-description">
+          <p>{service.description}</p>
+        </div>
 
-    <Link to={`/request-quote?service=${service.id}`}>
-      Request a Quote
-    </Link>
-  </div>
-);
+        <div className="service-details-meta">
+          <p className="service-details-price">
+            ${service.price}
+          </p>
+
+          <div className="service-details-actions">
+            <Link
+              className="service-details-link"
+              to="/services"
+            >
+              ← Back to Services
+            </Link>
+
+            <Link
+              className="service-details-link service-details-quote-link"
+              to={`/request-quote?service=${service.id}`}
+            >
+              Request a Quote →
+            </Link>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
 }
 
 export default ServiceDetails;

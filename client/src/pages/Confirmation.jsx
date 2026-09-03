@@ -1,6 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
 
-
 function Confirmation() {
   const location = useLocation();
 
@@ -8,28 +7,77 @@ function Confirmation() {
 
   if (!bookingRequest) {
     return (
-      <div>
-        <h2>Confirmation</h2>
-        <p>No booking confirmation was found.</p>
+      <div className="confirmation-page">
+        <section className="confirmation-empty">
+          <div className="confirmation-logo-placeholder">
+            Brand Logo
+          </div>
+
+          <p className="confirmation-eyebrow">
+            Confirmation
+          </p>
+
+          <h2 className="confirmation-title">
+            No Booking Confirmation Found
+          </h2>
+
+          <p className="confirmation-message">
+            No booking confirmation was found.
+          </p>
+
+          <Link
+            className="confirmation-link"
+            to="/"
+          >
+            Return Home →
+          </Link>
+        </section>
       </div>
     );
   }
 
   return (
-    <div>
-      <h2>Booking Request Received</h2>
+    <div className="confirmation-page">
+      <section className="confirmation-content">
+        <div className="confirmation-logo-placeholder">
+          Brand Logo
+        </div>
 
-      <p>Thank you, {bookingRequest.customer_name}.</p>
+        <p className="confirmation-eyebrow">
+          Booking Request Received
+        </p>
 
-      <p>Your confirmation number is:</p>
+        <h2 className="confirmation-title">
+          Thank You, {bookingRequest.customer_name}.
+        </h2>
 
-      <h3>{bookingRequest.confirmation_number}</h3>
+        <div className="confirmation-number-section">
+          <p className="confirmation-number-label">
+            Your Confirmation Number
+          </p>
 
-      <p>
-        A confirmation email has been sent to {bookingRequest.email}.
-      </p>
+          <h3 className="confirmation-number">
+            {bookingRequest.confirmation_number}
+          </h3>
+        </div>
 
-      <Link to="/">Return Home</Link>
+        <div className="confirmation-email">
+          <p>
+            A confirmation email has been sent to
+          </p>
+
+          <p className="confirmation-email-address">
+            {bookingRequest.email}
+          </p>
+        </div>
+
+        <Link
+          className="confirmation-link"
+          to="/"
+        >
+          Return Home →
+        </Link>
+      </section>
     </div>
   );
 }

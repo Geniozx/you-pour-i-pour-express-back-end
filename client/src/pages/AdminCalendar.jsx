@@ -22,7 +22,7 @@ function AdminCalendar() {
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-                "http://localhost:3000/api/booking-requests",
+                "/api/booking-requests",
                 {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -45,7 +45,7 @@ function AdminCalendar() {
 
 
             const blackoutResponse = await fetch(
-                "http://localhost:3000/api/blackout-dates",
+                "/api/blackout-dates",
                 {
                     headers: {
                     Authorization: `Bearer ${token}`
@@ -138,7 +138,7 @@ function AdminCalendar() {
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-            `http://localhost:3000/api/blackout-dates/${blackoutId}`,
+            `/api/blackout-dates/${blackoutId}`,
             {
                 method: "DELETE",
                 headers: {
@@ -184,7 +184,7 @@ function AdminCalendar() {
             const token = localStorage.getItem("token");
 
             const response = await fetch(
-            "http://localhost:3000/api/blackout-dates",
+            "/api/blackout-dates",
             {
                 method: "POST",
                 headers: {
@@ -220,31 +220,54 @@ function AdminCalendar() {
 
 
     return (
-        <div>
-            <h2>Admin Calendar</h2>
+        <div className="admin-calendar-page">
+            <section className="admin-calendar-header">
+            <p className="admin-eyebrow">
+                Administration
+            </p>
 
-            {loading && <p>Loading bookings...</p>}
-            {error && <p>{error}</p>}
+            <h2 className="admin-calendar-title">
+                Calendar
+            </h2>
 
+            <p className="admin-calendar-description">
+                Confirmed and reserved bookings appear on the calendar.
+                Select a date range to create a blackout period.
+            </p>
+            </section>
 
+            {loading && (
+            <p className="admin-status-message">
+                Loading bookings...
+            </p>
+            )}
+
+            {error && (
+            <p className="admin-status-message admin-error">
+                {error}
+            </p>
+            )}
+
+            <section className="admin-calendar-container">
             <FullCalendar
                 plugins={[
-                    themePlugin,
-                    dayGridPlugin,
-                    timeGridPlugin,
-                    interactionPlugin
+                themePlugin,
+                dayGridPlugin,
+                timeGridPlugin,
+                interactionPlugin
                 ]}
                 initialView="dayGridMonth"
                 headerToolbar={{
-                    left: "prev,next today",
-                    center: "title",
-                    right: "dayGridMonth,timeGridWeek,timeGridDay"
+                left: "prev,next today",
+                center: "title",
+                right: "dayGridMonth,timeGridWeek,timeGridDay"
                 }}
                 events={calendarEvents}
                 eventClick={handleEventClick}
                 select={handleDateSelect}
                 selectable={true}
             />
+            </section>
         </div>
     );
 }
